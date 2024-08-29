@@ -1,0 +1,137 @@
+
+config dnsmasq
+	option domainneeded '1'
+	option localise_queries '1'
+	option rebind_protection '1'
+	option rebind_localhost '1'
+	option local '/fritz.box/'
+	option domain 'fritz.box'
+	option expandhosts '1'
+	option cachesize '1000'
+	option authoritative '1'
+	option readethers '1'
+	option leasefile '/tmp/dhcp.leases'
+	option resolvfile '/tmp/resolv.conf.d/resolv.conf.auto'
+	option localservice '1'
+	option ednspacket_max '1232'
+
+config dhcp 'lan'
+	option interface 'lan'
+	option start '220'
+	option limit '30'
+	option leasetime '5m'
+	option dhcpv4 'server'
+	option dhcpv6 'server'
+	option ra 'server'
+	list ra_flags 'managed-config'
+	list ra_flags 'other-config'
+
+config dhcp 'wan'
+	option interface 'wan'
+	option ignore '1'
+
+config odhcpd 'odhcpd'
+	option maindhcp '0'
+	option leasefile '/tmp/hosts/odhcpd'
+	option leasetrigger '/usr/sbin/odhcpd-update'
+	option loglevel '4'
+
+config host
+	option name 'thinkpad-x13s'
+	option ip '192.168.66.19'
+	list mac '68:DA:73:A3:74:56'
+	option dns '1'
+
+config host
+	option name 'odroidm1'
+	option ip '192.168.66.124'
+	list mac 'FE:9B:E6:5C:7D:15'
+	option dns '1'
+	option hostid 'deadbeefb00bbaad'
+
+config host
+	option name 'khadas-vim3'
+	option ip '192.168.66.93'
+	list mac 'C8:63:14:72:4E:AC'
+	option hostid 'cafebabedeadbeef'
+	option dns '1'
+
+config host
+	option name 'nullpointer-onboard'
+	option ip '192.168.66.60'
+	list mac '2C:4D:54:D3:BE:57'
+	option dns '1'
+
+config host
+	option name 'vm01'
+	option ip '192.168.66.71'
+	list mac '52:54:00:01:03:01'
+	option dns '1'
+
+config host
+	option name 'vm02'
+	option ip '192.168.66.72'
+	list mac '52:54:00:01:03:02'
+	option dns '1'
+
+config host
+	option name 'vm03'
+	option ip '192.168.66.73'
+	list mac '52:54:00:01:03:03'
+	option dns '1'
+
+config host
+	option name 'vm04'
+	option ip '192.168.66.74'
+	list mac '52:54:00:01:03:04'
+	option dns '1'
+
+config host
+	option name 'vm05'
+	option ip '192.168.66.75'
+	list mac '52:54:00:01:03:05'
+	option dns '1'
+
+config host
+	option name 'vm06'
+	option ip '192.168.66.76'
+	list mac '52:54:00:01:03:06'
+	option dns '1'
+
+config host
+	option name 'vm07'
+	option ip '192.168.66.77'
+	list mac '52:54:00:01:03:08'
+	option dns '1'
+
+config host
+	option name 'vm08'
+	option ip '192.168.66.78'
+	list mac '52:54:00:01:03:08'
+	option dns '1'
+
+config host
+	option name 'vm09'
+	option ip '192.168.66.79'
+	list mac '52:54:00:01:03:09'
+	option dns '1'
+
+config host
+	option name 'CoreELEC-vim1s'
+	option ip '192.168.66.22'
+	list mac 'C8:63:14:71:19:3D'
+	option dns '1'
+
+config host
+	option name 'mekotronics-r58x-pro-eth1'
+	option ip '192.168.66.17'
+	list mac '66:64:39:35:5A:52'
+	option dns '1'
+	option hostid 'deadbeefcafebabe'
+
+config host
+	option name 'mekotronics-r58x-pro-eth0'
+	option dns '1'
+	list mac '6a:64:39:35:5a:52'
+	option ip '192.168.66.16'
+
