@@ -1,0 +1,42 @@
+
+config interface 'loopback'
+	option device 'lo'
+	option proto 'static'
+	option ipaddr '127.0.0.1'
+	option netmask '255.0.0.0'
+
+config globals 'globals'
+	option ula_prefix 'fd00:dead:beef::/48'
+
+config device
+	option name 'br-lan'
+	option type 'bridge'
+	list ports 'eth1'
+	list ports 'eth2'
+
+config device
+	option name 'eth1'
+	option macaddr 'ba:27:c0:e8:eb:c5'
+
+config device
+	option name 'eth2'
+	option macaddr 'ba:27:c0:e8:eb:c5'
+
+config interface 'lan'
+	option device 'br-lan'
+	option proto 'static'
+	option ipaddr '192.168.66.1'
+	option netmask '255.255.255.0'
+	option ip6assign '60'
+
+config device
+	option name 'eth0'
+	option macaddr 'ba:27:c0:e8:eb:c4'
+
+config interface 'wan'
+	option device 'eth0.6'
+	option proto 'pppoe'
+	option username 'FB7490@xs4all.nl'
+	option password '1234'
+	option ipv6 'auto'
+
