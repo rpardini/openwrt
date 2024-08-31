@@ -47,14 +47,16 @@ config host
 	option ip '192.168.66.124'
 	list mac 'FE:9B:E6:5C:7D:15'
 	option dns '1'
-	option hostid 'deadbeefb00bbaad'
+	option hostid 'faceb00cb00b'
+	option duid '00020000ab11e76a979ba937eca8'
 
 config host
 	option name 'khadas-vim3'
 	option ip '192.168.66.93'
 	list mac 'C8:63:14:72:4E:AC'
-	option hostid 'cafebabedeadbeef'
+	option hostid 'cafebabe'
 	option dns '1'
+	option duid '00020000ab116f931a3c57d7e195'
 
 config host
 	option name 'nullpointer-onboard'
@@ -127,7 +129,6 @@ config host
 	option ip '192.168.66.17'
 	list mac '66:64:39:35:5A:52'
 	option dns '1'
-	option hostid 'deadbeefcafebabe'
 
 config host
 	option name 'mekotronics-r58x-pro-eth0'
