@@ -125,14 +125,6 @@ config host
 	list mac 'C8:63:14:71:19:3D'
 	option dns '1'
 
-config domain
-	option name 'kodi-fileserver.fritz.box'
-	option ip '192.168.66.97'
-
-config domain
-	option name 'kodi-mysql.fritz.box'
-	option ip '192.168.66.120'
-
 config host
 	option name 'mekotronics-r58x-pro-lan2'
 	option ip '192.168.66.17'
@@ -217,9 +209,23 @@ config host
 	list mac '72:34:31:63:50:5e'
 	option dns '1'
 
+config domain
+	option name 'kodi-fileserver.fritz.box'
+	option ip '192.168.66.97'
+
+config domain
+	option name 'kodi-mysql.fritz.box'
+	option ip '192.168.66.120'
+
 config host
 	option name 'phytium'
 	option ip '192.168.66.87'
 	list mac '98:0E:24:74:8A:19'
 	option dns '1'
+
+config host
+	option name 'nanopi-r6c'
+	option ip '192.168.66.88'
+	option dns '1'
+	list mac 'a2:a9:d2:fa:ac:15'
 
