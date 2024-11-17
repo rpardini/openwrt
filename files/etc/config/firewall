@@ -186,3 +186,12 @@ config rule
 	option dest_port '443'
 	option target 'ACCEPT'
 
+config rule
+	option name 'allow-ipv6-c0de-port80'
+	option family 'ipv6'
+	list proto 'tcp'
+	option src '*'
+	list dest_ip '2a02:a466:4d7a::c0de'
+	option dest_port '80'
+	option target 'ACCEPT'
+
