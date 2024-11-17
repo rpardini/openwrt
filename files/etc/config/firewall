@@ -118,38 +118,6 @@ config rule
 	option proto 'udp'
 	option target 'ACCEPT'
 
-config redirect
-	option dest 'lan'
-	option target 'DNAT'
-	option name 'main ingress 80 vim3'
-	option family 'ipv4'
-	option src 'wan'
-	option src_dport '80'
-	option dest_ip '192.168.66.93'
-	option dest_port '80'
-	option reflection_src 'external'
-
-config redirect
-	option dest 'lan'
-	option target 'DNAT'
-	option name 'main ingress 443 vim3'
-	option family 'ipv4'
-	option src 'wan'
-	option src_dport '443'
-	option dest_ip '192.168.66.93'
-	option dest_port '443'
-	option reflection_src 'external'
-
-config redirect
-	option dest 'lan'
-	option target 'DNAT'
-	option name 'main ingress 22 vim3'
-	option src 'wan'
-	option src_dport '22'
-	option dest_ip '192.168.66.93'
-	option dest_port '22'
-	option reflection_src 'external'
-
 config rule
 	option name 'allow-ipv6-ingress-to-vim3-port-80'
 	option family 'ipv6'
@@ -187,11 +155,29 @@ config rule
 	option target 'ACCEPT'
 
 config rule
-	option name 'allow-ipv6-c0de-port80'
+	option name 'allow-ipv6-c0de-port-80'
 	option family 'ipv6'
 	list proto 'tcp'
 	option src '*'
 	list dest_ip '2a02:a466:4d7a::c0de'
+	option dest_port '80'
+	option target 'ACCEPT'
+
+config rule
+	option name 'allow-ipv4-public-port-443'
+	list proto 'tcp'
+	option src '*'
+	list dest_ip '195.240.102.13'
+	option dest_port '443'
+	option target 'ACCEPT'
+	option family 'ipv4'
+
+config rule
+	option name 'allow-ipv4-public-port-80'
+	option family 'ipv4'
+	list proto 'tcp'
+	option src '*'
+	list dest_ip '195.240.102.13'
 	option dest_port '80'
 	option target 'ACCEPT'
 
