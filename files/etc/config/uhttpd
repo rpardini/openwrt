@@ -1,7 +1,7 @@
 
 config uhttpd 'main'
-	list listen_http '192.168.66.1:80'
-	list listen_https '192.168.66.1:443'
+	list listen_http '192.168.66.1:5080'
+	list listen_https '192.168.66.1:5443'
 	option redirect_https '0'
 	option home '/www'
 	option rfc1918_filter '1'
