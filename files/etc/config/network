@@ -28,6 +28,7 @@ config interface 'lan'
 	option ipaddr '192.168.66.1'
 	option netmask '255.255.255.0'
 	option ip6assign '60'
+	list ip6addr '2a02:a466:4d7a::c0de/128'
 
 config device
 	option name 'eth0'
