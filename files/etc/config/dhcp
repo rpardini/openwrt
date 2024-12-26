@@ -229,3 +229,9 @@ config host
 	option dns '1'
 	list mac 'a2:a9:d2:fa:ac:15'
 
+config host
+	option name 't95z'
+	option ip '192.168.66.27'
+	list mac 'EA:DA:5C:76:8D:09'
+	option dns '1'
+
