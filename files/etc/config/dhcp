@@ -235,3 +235,21 @@ config host
 	list mac 'EA:DA:5C:76:8D:09'
 	option dns '1'
 
+config host
+	option name 'rpi4b'
+	option ip '192.168.66.20'
+	list mac 'DC:A6:32:EC:8B:49'
+	option dns '1'
+
+config host
+	option name 'M4ProMini'
+	option ip '192.168.66.10'
+	list mac 'D0:11:E5:1C:6F:D8'
+	option dns '1'
+
+config host
+	option name 'M4ProMiniWifi'
+	option ip '192.168.66.11'
+	list mac '36:81:6C:D6:87:8A'
+	option dns '1'
+
