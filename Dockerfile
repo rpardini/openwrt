@@ -17,12 +17,13 @@ RUN git clone --branch ${OPENWRT_BRANCH} ${OPENWRT_GIT_URL} openwrt
 
 WORKDIR /src/openwrt
 
-RUN ./scripts/feeds update -a && ./scripts/feeds install -a
-
 ARG OPENWRT_CONFIG=diffconfig.r5s.final
 ARG OPENWRT_REVISION=r5s
 RUN echo "Should get OPENWRT_REVISION: ${OPENWRT_REVISION}"
 RUN git pull --rebase
+
+RUN ./scripts/feeds update -a && ./scripts/feeds install -a
+
 RUN cp -v ${OPENWRT_CONFIG} .config && make defconfig
 
 FROM configured AS build
