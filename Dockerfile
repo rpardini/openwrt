@@ -1,4 +1,4 @@
-FROM debian:stable AS build
+FROM debian:stable AS configured
 
 # Install dependencies for building OpenWRT, plus utils for compression and randomizing MBR label-id
 ENV DEBIAN_FRONTEND=noninteractive
@@ -20,9 +20,12 @@ WORKDIR /src/openwrt
 RUN ./scripts/feeds update -a && ./scripts/feeds install -a
 
 ARG OPENWRT_CONFIG=diffconfig.r5s.final
+ARG OPENWRT_REVISION=r5s
+RUN echo "Should get OPENWRT_REVISION: ${OPENWRT_REVISION}"
 RUN git pull --rebase
 RUN cp -v ${OPENWRT_CONFIG} .config && make defconfig
 
+FROM configured AS build
 # Download sources; as this can fail due to network issues, we retry a few times with decreasing parallelism
 RUN make download -j$(($(nproc)+2)) || make download -j4 || make download -j2 || make download || make download
 
