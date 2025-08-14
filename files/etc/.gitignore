@@ -22,3 +22,4 @@ config/ttyd
 config/ubootenv
 config/wifi_schedule
 config/wireless
+dropbear/dropbear_*_host_key
