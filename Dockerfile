@@ -39,7 +39,7 @@ RUN make -j$(($(nproc)+2)) toolchain/install || make toolchain/install -j1 V=s
 RUN make -j$(($(nproc)+2)) target/linux/compile || make target/linux/compile -j1 V=s
 
 # Build the packages
-RUN make -j$(($(nproc)+2)) package/compile || make package/compile -j1 V=s
+RUN make -j$(($(nproc)+2)) package/compile || make -j8 package/compile  || make -j4 package/compile || make -j2 package/compile || make package/compile -j1 V=s
 
 # Build the firmware
 RUN make -j$(($(nproc)+2)) || make -j1 V=s
