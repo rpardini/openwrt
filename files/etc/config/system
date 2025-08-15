@@ -5,7 +5,7 @@ config system
 	option ttylogin '0'
 	option log_size '64'
 	option urandom_seed '0'
-	option description 'Manually built OpenWRT'
+	option description 'Image-based OpenWRT fully automated'
 	option zonename 'Europe/Amsterdam'
 	option log_proto 'udp'
 	option conloglevel '8'
