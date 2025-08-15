@@ -1,7 +1,6 @@
 
 config dnsmasq
 	option domainneeded '1'
-	option localise_queries '1'
 	option rebind_protection '0'
 	option local '/fritz.box/'
 	option domain 'fritz.box'
@@ -117,12 +116,6 @@ config host
 	option name 'vm09'
 	option ip '192.168.66.79'
 	list mac '52:54:00:01:03:09'
-	option dns '1'
-
-config host
-	option name 'CoreELEC-vim1s'
-	option ip '192.168.66.22'
-	list mac 'C8:63:14:71:19:3D'
 	option dns '1'
 
 config host
