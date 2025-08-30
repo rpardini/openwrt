@@ -25,6 +25,7 @@ config dhcp 'lan'
 	list ra_flags 'managed-config'
 	list ra_flags 'other-config'
 	list dhcp_option '42,192.168.66.1'
+	option dns_service '0'
 
 config dhcp 'wan'
 	option interface 'wan'
@@ -239,12 +240,14 @@ config host
 	option ip '192.168.66.10'
 	list mac 'D0:11:E5:1C:6F:D8'
 	option dns '1'
+	list tag 'pihole'
 
 config host
 	option name 'M4ProMiniWifi'
 	option ip '192.168.66.11'
 	list mac '36:81:6C:D6:87:8A'
 	option dns '1'
+	list tag 'pihole'
 
 config domain
 	option name 'tinkerbell'
@@ -261,4 +264,21 @@ config host
 	option ip '192.168.66.123'
 	list mac '6E:34:31:63:50:5E'
 	option dns '1'
+
+config host
+	option name 'MacBookPro'
+	option ip '192.168.66.229'
+	list mac 'F6:F8:A2:D1:1C:E4'
+	list tag 'pihole'
+	option dns '1'
+
+config host
+	option name 'Pixel-9'
+	option ip '192.168.66.220'
+	list mac '4E:B2:3F:90:98:29'
+	list tag 'pihole'
+	option dns '1'
+
+config tag 'pihole'
+	option dhcp_option '6,192.168.66.88'
 
