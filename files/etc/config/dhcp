@@ -70,12 +70,14 @@ config host
 	option ip '192.168.66.71'
 	list mac '52:54:00:01:03:01'
 	option dns '1'
+	list tag 'tinkuefipxe'
 
 config host
 	option name 'vm02'
 	option ip '192.168.66.72'
 	list mac '52:54:00:01:03:02'
 	option dns '1'
+	list tag 'tinkuefipxe'
 
 config host
 	option name 'vm03'
@@ -281,4 +283,8 @@ config host
 
 config tag 'pihole'
 	option dhcp_option '6,192.168.66.88'
+
+config tag 'tinkuefipxe'
+	list dhcp_option '66,192.168.66.170'
+	list dhcp_option '67,ipxe.efi'
 
