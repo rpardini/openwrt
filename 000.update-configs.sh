@@ -11,6 +11,12 @@ LOCAL_FILES_ETC_DIR="$LOCAL_FILES_DIR/etc"
 
 SOURCE_IP="192.168.66.1"
 
+declare -a files_to_copy=("/etc/dnsmasq.conf")
+# Loop over the files and copy them using scp from the SOURCE_IP
+for file in "${files_to_copy[@]}"; do
+	echo "--> Copying $file from $SOURCE_IP to $LOCAL_FILES_ETC_DIR"
+	scp "root@$SOURCE_IP:$file" "$LOCAL_FILES_ETC_DIR/"
+done
 
 declare -a dirs_to_copy=("/etc/config" "/etc/dropbear" "/etc/nginx" "/etc/frr")
 
