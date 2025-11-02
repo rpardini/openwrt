@@ -37,6 +37,46 @@ config odhcpd 'odhcpd'
 	option leasetrigger '/usr/sbin/odhcpd-update'
 	option loglevel '4'
 
+config domain
+	option name 'kodi-fileserver.fritz.box'
+	option ip '192.168.66.97'
+
+config domain
+	option name 'kodi-mysql.fritz.box'
+	option ip '192.168.66.120'
+
+config host
+	option name 'M4ProMini'
+	option ip '192.168.66.10'
+	list mac 'D0:11:E5:1C:6F:D8'
+	option dns '1'
+	list tag 'pihole'
+
+config host
+	option name 'M4ProMiniWifi'
+	option ip '192.168.66.11'
+	list mac '36:81:6C:D6:87:8A'
+	option dns '1'
+	list tag 'pihole'
+
+config host
+	option name 'mixtile-edge2-wifi'
+	option ip '192.168.66.15'
+	list mac '20:50:e7:4c:ef:9e'
+	option dns '1'
+
+config host
+	option name 'mekotronics-r58x-pro-lan1'
+	option dns '1'
+	list mac '6a:64:39:35:5a:52'
+	option ip '192.168.66.16'
+
+config host
+	option name 'mekotronics-r58x-pro-lan2'
+	option ip '192.168.66.17'
+	list mac '66:64:39:35:5A:52'
+	option dns '1'
+
 config host
 	option name 'thinkpad-x13s'
 	option ip '192.168.66.19'
@@ -44,20 +84,34 @@ config host
 	option dns '1'
 
 config host
-	option name 'odroidm1'
-	option ip '192.168.66.124'
-	list mac 'FE:9B:E6:5C:7D:15'
+	option name 'rpi4b'
+	option ip '192.168.66.20'
+	list mac 'DC:A6:32:EC:8B:49'
 	option dns '1'
-	option hostid 'faceb00cb00b'
-	option duid '00020000ab11e76a979ba937eca8'
 
 config host
-	option name 'khadas-vim3'
-	option ip '192.168.66.93'
-	list mac 'C8:63:14:72:4E:AC'
-	option hostid 'cafebabe'
+	option name 'rpi4b-4g-hifiberry'
+	option ip '192.168.66.21'
+	list mac 'DC:A6:32:73:D6:95'
 	option dns '1'
-	option duid '00020000ab116f931a3c57d7e195'
+
+config host
+	option name 't95z'
+	option ip '192.168.66.27'
+	list mac 'EA:DA:5C:76:8D:09'
+	option dns '1'
+
+config host
+	option name 'reolink-e1pro-wifi'
+	option ip '192.168.66.31'
+	list mac '0C:91:60:B6:A2:8A'
+	option dns '1'
+
+config host
+	option name 'rockpro64'
+	option dns '1'
+	list mac '2a:36:cb:a2:ae:b8'
+	option ip '192.168.66.43'
 
 config host
 	option name 'nullpointer-onboard'
@@ -122,28 +176,16 @@ config host
 	option dns '1'
 
 config host
-	option name 'mekotronics-r58x-pro-lan2'
-	option ip '192.168.66.17'
-	list mac '66:64:39:35:5A:52'
+	option name 'phytium'
+	option ip '192.168.66.87'
+	list mac '98:0E:24:74:8A:19'
 	option dns '1'
 
 config host
-	option name 'mekotronics-r58x-pro-lan1'
+	option name 'nanopi-r6c'
+	option ip '192.168.66.88'
 	option dns '1'
-	list mac '6a:64:39:35:5a:52'
-	option ip '192.168.66.16'
-
-config host
-	option name 'rockpro64'
-	option dns '1'
-	list mac '2a:36:cb:a2:ae:b8'
-	option ip '192.168.66.43'
-
-config host
-	option name 'thinkpad-x13s-wifi'
-	option ip '192.168.66.144'
-	list mac '00:03:7F:12:76:B2'
-	option dns '1'
+	list mac 'a2:a9:d2:fa:ac:15'
 
 config host
 	option name 'odroidhc4-2'
@@ -152,15 +194,41 @@ config host
 	option dns '1'
 
 config host
-	option name 'mekotronics-r58x-4g-lan1'
-	option ip '192.168.66.174'
-	list mac '66:38:32:66:01:50'
+	option name 'mixtile-blade3-b'
+	option ip '192.168.66.120'
+	list mac '66:6b:65:61:01:50'
 	option dns '1'
 
 config host
-	option name 'mekotronics-r58x-4g-lan2'
-	option ip '192.168.66.173'
-	list mac '6a:38:32:66:01:50'
+	option name 'mixtile-blade3-c'
+	option ip '192.168.66.121'
+	list mac '72:34:31:63:50:5e'
+	option dns '1'
+
+config host
+	option name 'blade3c'
+	option ip '192.168.66.123'
+	list mac '6E:34:31:63:50:5E'
+	option dns '1'
+
+config host
+	option name 'odroidm1'
+	option ip '192.168.66.124'
+	list mac 'FE:9B:E6:5C:7D:15'
+	option dns '1'
+	option hostid 'faceb00cb00b'
+	option duid '00020000ab11e76a979ba937eca8'
+
+config host
+	option name 'mixtile-blade3-a'
+	option ip '192.168.66.142'
+	list mac '62:66:30:3a:00:54'
+	option dns '1'
+
+config host
+	option name 'thinkpad-x13s-wifi'
+	option ip '192.168.66.144'
+	list mac '00:03:7F:12:76:B2'
 	option dns '1'
 
 config host
@@ -182,89 +250,22 @@ config host
 	option dns '1'
 
 config host
-	option name 'mixtile-edge2-wifi'
-	option ip '192.168.66.15'
-	list mac '20:50:e7:4c:ef:9e'
+	option name 'mekotronics-r58x-4g-lan2'
+	option ip '192.168.66.173'
+	list mac '6a:38:32:66:01:50'
 	option dns '1'
 
 config host
-	option name 'mixtile-blade3-a'
-	option ip '192.168.66.142'
-	list mac '62:66:30:3a:00:54'
+	option name 'mekotronics-r58x-4g-lan1'
+	option ip '192.168.66.174'
+	list mac '66:38:32:66:01:50'
 	option dns '1'
 
 config host
-	option name 'mixtile-blade3-b'
-	option ip '192.168.66.120'
-	list mac '66:6b:65:61:01:50'
-	option dns '1'
-
-config host
-	option name 'mixtile-blade3-c'
-	option ip '192.168.66.121'
-	list mac '72:34:31:63:50:5e'
-	option dns '1'
-
-config domain
-	option name 'kodi-fileserver.fritz.box'
-	option ip '192.168.66.97'
-
-config domain
-	option name 'kodi-mysql.fritz.box'
-	option ip '192.168.66.120'
-
-config host
-	option name 'phytium'
-	option ip '192.168.66.87'
-	list mac '98:0E:24:74:8A:19'
-	option dns '1'
-
-config host
-	option name 'nanopi-r6c'
-	option ip '192.168.66.88'
-	option dns '1'
-	list mac 'a2:a9:d2:fa:ac:15'
-
-config host
-	option name 't95z'
-	option ip '192.168.66.27'
-	list mac 'EA:DA:5C:76:8D:09'
-	option dns '1'
-
-config host
-	option name 'rpi4b'
-	option ip '192.168.66.20'
-	list mac 'DC:A6:32:EC:8B:49'
-	option dns '1'
-
-config host
-	option name 'M4ProMini'
-	option ip '192.168.66.10'
-	list mac 'D0:11:E5:1C:6F:D8'
-	option dns '1'
+	option name 'Pixel-9'
+	option ip '192.168.66.220'
+	list mac '4E:B2:3F:90:98:29'
 	list tag 'pihole'
-
-config host
-	option name 'M4ProMiniWifi'
-	option ip '192.168.66.11'
-	list mac '36:81:6C:D6:87:8A'
-	option dns '1'
-	list tag 'pihole'
-
-config domain
-	option name 'tinkerbell'
-	option ip '192.168.66.170'
-
-config host
-	option name 'rpi4b-4g-hifiberry'
-	option ip '192.168.66.21'
-	list mac 'DC:A6:32:73:D6:95'
-	option dns '1'
-
-config host
-	option name 'blade3c'
-	option ip '192.168.66.123'
-	list mac '6E:34:31:63:50:5E'
 	option dns '1'
 
 config host
@@ -274,12 +275,9 @@ config host
 	list tag 'pihole'
 	option dns '1'
 
-config host
-	option name 'Pixel-9'
-	option ip '192.168.66.220'
-	list mac '4E:B2:3F:90:98:29'
-	list tag 'pihole'
-	option dns '1'
+config domain
+	option name 'tinkerbell'
+	option ip '192.168.66.170'
 
 config tag 'pihole'
 	option dhcp_option '6,192.168.66.88'
