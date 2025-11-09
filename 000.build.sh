@@ -14,3 +14,5 @@ docker build \
 	--build-arg=OPENWRT_GIT_URL=https://github.com/rpardini/openwrt.git --build-arg=OPENWRT_BRANCH=r5s \
 	"--build-arg=OPENWRT_REVISION=$REMOTE_SHA1" --build-arg=OPENWRT_CONFIG=diffconfig.r5s.final \
 	-t openwrt:r5s .
+
+docker cp $(docker create --rm openwrt:r5s):/out ./
