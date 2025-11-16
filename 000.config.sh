@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -e
+
 declare REMOTE_SHA1 LOCAL_SHA1
 REMOTE_SHA1=$(git ls-remote "https://github.com/rpardini/openwrt.git" "r5s" | awk '{ print $1 }')
 LOCAL_SHA1=$(git rev-parse HEAD)
