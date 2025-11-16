@@ -17,13 +17,37 @@ RUN git clone --branch ${OPENWRT_BRANCH} ${OPENWRT_GIT_URL} openwrt
 
 WORKDIR /src/openwrt
 
-ARG OPENWRT_CONFIG=diffconfig.r5s.final
-ARG OPENWRT_REVISION=r5s
-RUN echo "Should get OPENWRT_REVISION: ${OPENWRT_REVISION}"
-RUN git pull --rebase
+RUN <<HEREDOC
+echo "Fix feeds.conf.default to use GitHub instead of git.openwrt.org - pre pull"
+sed -i 's|git.openwrt.org/feed/|github.com/openwrt/|g' ./feeds.conf.default
+HEREDOC
 
 RUN ./scripts/feeds update -a && ./scripts/feeds install -a
 
+ARG OPENWRT_REVISION=r5s
+RUN echo "Should get OPENWRT_REVISION: ${OPENWRT_REVISION}"
+# Revert all changes, then checkout the desired revision
+RUN git reset --hard
+RUN git pull --rebase
+
+# Use GitHub for feeds; don't use git.openwrt.org
+RUN <<HEREDOC
+echo "Fix feeds.conf.default to use GitHub instead of git.openwrt.org - post pull"
+sed -i 's|git.openwrt.org/feed/|github.com/openwrt/|g' ./feeds.conf.default
+HEREDOC
+
+RUN ./scripts/feeds update -a && ./scripts/feeds install -a
+
+# Use GitHub for feeds; don't use git.openwrt.org
+RUN <<HEREDOC
+cat ./feeds.conf.default
+(cd feeds/packages && git status && git remote -v)
+(cd feeds/luci && git status && git remote -v)
+(cd feeds/routing && git status && git remote -v)
+(cd feeds/telephony && git status && git remote -v)
+HEREDOC
+
+ARG OPENWRT_CONFIG=diffconfig.r5s.final
 RUN cp -v ${OPENWRT_CONFIG} .config && make defconfig
 
 FROM configured AS build
