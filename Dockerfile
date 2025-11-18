@@ -10,31 +10,24 @@ RUN apt -y update && apt -y install build-essential git make tree unzip wget fil
 RUN useradd -m openwrt && mkdir -p /src /dist && chown -R openwrt /src /dist
 USER openwrt
 
-WORKDIR /src
-ARG OPENWRT_GIT_URL=https://github.com/rpardini/openwrt.git
-ARG OPENWRT_BRANCH=r5s
-RUN git clone --branch ${OPENWRT_BRANCH} ${OPENWRT_GIT_URL} openwrt
-
 WORKDIR /src/openwrt
+COPY --chown=openwrt:root config config
+COPY --chown=openwrt:root files files
+COPY --chown=openwrt:root include include
+COPY --chown=openwrt:root LICENSES LICENSES
+COPY --chown=openwrt:root package package
+COPY --chown=openwrt:root scripts scripts
+COPY --chown=openwrt:root target target
+COPY --chown=openwrt:root toolchain toolchain
+COPY --chown=openwrt:root tools tools
+COPY --chown=openwrt:root .gitattributes .gitignore BSDmakefile Config.in COPYING feeds.conf.default ./
+COPY --chown=openwrt:root Makefile rules.mk ./
+RUN ls -lah
 
-RUN <<HEREDOC
-echo "Fix feeds.conf.default to use GitHub instead of git.openwrt.org - pre pull"
-sed -i 's|git.openwrt.org/feed/|github.com/openwrt/|g' ./feeds.conf.default
-HEREDOC
-
-RUN ./scripts/feeds update -a && ./scripts/feeds install -a
-
-ARG OPENWRT_REVISION=r5s
-RUN echo "Should get OPENWRT_REVISION: ${OPENWRT_REVISION}"
-# Revert all changes, then checkout the desired revision
-RUN git reset --hard
-RUN git pull --rebase
-
-# Use GitHub for feeds; don't use git.openwrt.org
-RUN <<HEREDOC
-echo "Fix feeds.conf.default to use GitHub instead of git.openwrt.org - post pull"
-sed -i 's|git.openwrt.org/feed/|github.com/openwrt/|g' ./feeds.conf.default
-HEREDOC
+#RUN <<HEREDOC
+#echo "Fix feeds.conf.default to use GitHub instead of git.openwrt.org - pre pull"
+#sed -i 's|git.openwrt.org/feed/|github.com/openwrt/|g' ./feeds.conf.default
+#HEREDOC
 
 RUN ./scripts/feeds update -a && ./scripts/feeds install -a
 
@@ -48,7 +41,20 @@ cat ./feeds.conf.default
 HEREDOC
 
 ARG OPENWRT_CONFIG=diffconfig.r5s.final
-RUN cp -v ${OPENWRT_CONFIG} .config && make defconfig
+ADD --chown=openwrt:root ${OPENWRT_CONFIG} ./
+RUN cp -v ${OPENWRT_CONFIG} .config
+RUN make defconfig
+
+RUN grep '=m' .config
+
+# Use sed to turn all modules (=m) into built-in (=y) - we don't ship packages, only the image (immutable firmware)
+RUN sed -i 's/=\(m\)/=y/g' .config
+RUN make defconfig
+
+RUN ./scripts/diffconfig.sh > ${OPENWRT_CONFIG}.new
+
+RUN echo "Diff between provided config and final config used for build:"
+RUN diff -u ${OPENWRT_CONFIG} ${OPENWRT_CONFIG}.new || true
 
 FROM configured AS build
 # Download sources; as this can fail due to network issues, we retry a few times with decreasing parallelism
@@ -68,6 +74,9 @@ RUN make -j$(($(nproc)+2)) package/compile || make -j8 package/compile  || make 
 
 # Build the firmware
 RUN make -j$(($(nproc)+2)) || make -j1 V=s
+
+# Show results with tree
+RUN tree -h bin
 
 # Decompress gzip, random MBR label-id, and compress with zstd
 RUN cp -v bin/targets/*/*/*.img.gz /dist && \
