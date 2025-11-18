@@ -85,10 +85,11 @@ config host
 	option dns '1'
 
 config host
-	option name 'rpi4b'
+	option name 'rpi4b8g-eth'
 	option ip '192.168.66.20'
 	list mac 'DC:A6:32:EC:8B:49'
 	option dns '1'
+	list tag 'tinkrpit6'
 
 config host
 	option name 'rpi4b-4g-hifiberry'
@@ -119,20 +120,21 @@ config host
 	option ip '192.168.66.60'
 	list mac '2C:4D:54:D3:BE:57'
 	option dns '1'
+	list tag 'tinkuefix86pxet6'
 
 config host
 	option name 'vm01'
 	option ip '192.168.66.71'
 	list mac '52:54:00:01:03:01'
 	option dns '1'
-	list tag 'tinkuefipxe'
+	list tag 'tinkuefix86pxet6'
 
 config host
 	option name 'vm02'
 	option ip '192.168.66.72'
 	list mac '52:54:00:01:03:02'
 	option dns '1'
-	list tag 'tinkuefipxe'
+	list tag 'tinkuefix86pxet6'
 
 config host
 	option name 'vm03'
@@ -189,10 +191,18 @@ config host
 	list mac 'a2:a9:d2:fa:ac:15'
 
 config host
+	option name 'khadas-vim3l-eth'
+	option dns '1'
+	list mac 'C8:63:14:71:2A:6D'
+	option ip '192.168.66.93'
+	list tag 'tinkuefiarm64pxe'
+
+config host
 	option name 'odroidhc4-2'
 	option ip '192.168.66.98'
 	list mac '00:1E:06:49:15:91'
 	option dns '1'
+	list tag 'tinkpxelinuxt6'
 
 config host
 	option name 'mixtile-blade3-b'
@@ -229,8 +239,8 @@ config host
 config host
 	option name 'thinkpad-x13s-wifi'
 	option ip '192.168.66.144'
-	list mac '00:03:7F:12:76:B2'
 	option dns '1'
+	list mac '00:03:7f:12:bd:f0'
 
 config host
 	option name 'cm3588-nas'
@@ -243,12 +253,14 @@ config host
 	option ip '192.168.66.171'
 	list mac '8e:b4:90:97:32:30'
 	option dns '1'
+	list tag 'tinkuefiarm64pxe'
 
 config host
 	option name 'nanopct6-16gb-lts-lan2'
 	option ip '192.168.66.172'
 	list mac '8e:b4:90:97:32:31'
 	option dns '1'
+	list tag 'tinkuefiarm64pxe'
 
 config host
 	option name 'mekotronics-r58x-4g-lan2'
