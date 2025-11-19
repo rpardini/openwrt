@@ -24,12 +24,18 @@ COPY --chown=openwrt:root .gitattributes .gitignore BSDmakefile Config.in COPYIN
 COPY --chown=openwrt:root Makefile rules.mk ./
 RUN ls -lah
 
-#RUN <<HEREDOC
-#echo "Fix feeds.conf.default to use GitHub instead of git.openwrt.org - pre pull"
-#sed -i 's|git.openwrt.org/feed/|github.com/openwrt/|g' ./feeds.conf.default
-#HEREDOC
+RUN <<HEREDOC
+echo "Fix feeds.conf.default to use GitHub instead of git.openwrt.org - pre pull"
+sed -i 's|git.openwrt.org/project/|github.com/openwrt/|g' ./feeds.conf.default
+sed -i 's|git.openwrt.org/feed/|github.com/openwrt/|g' ./feeds.conf.default
+HEREDOC
 
-RUN ./scripts/feeds update -a && ./scripts/feeds install -a
+# Show contents of cache
+RUN --mount=type=cache,id=openwrt_feeds,target=/src/openwrt/feeds,uid=1000 du -h -d 3 -x /src/openwrt/feeds | sort -h
+# Update and install feeds; use cache for feeds
+RUN --mount=type=cache,id=openwrt_feeds,target=/src/openwrt/feeds,uid=1000 ./scripts/feeds update -a && ./scripts/feeds install -a && cp -pr /src/openwrt/feeds /src/openwrt/feeds_cached
+# Copy back the cached feeds
+RUN rm -rf /src/openwrt/feeds && mv /src/openwrt/feeds_cached /src/openwrt/feeds
 
 # Use GitHub for feeds; don't use git.openwrt.org
 RUN <<HEREDOC
@@ -45,21 +51,32 @@ ADD --chown=openwrt:root ${OPENWRT_CONFIG} ./
 RUN cp -v ${OPENWRT_CONFIG} .config
 RUN make defconfig
 
-RUN grep '=m' .config
+## # we don't ship packages, only the image (immutable firmware)
+## # Use sed to turn all modules (CONFIG_xxx=m) into disabled "# CONFIG_xxx is not set"
+## RUN grep '=m' .config || true
+## RUN sed -i 's/^\(CONFIG_.*\)=m$/# \1 is not set/g' .config
+## RUN make defconfig
+## RUN ./scripts/diffconfig.sh > ${OPENWRT_CONFIG}.new
+## RUN echo "Diff between provided config and final config used for build:"
+## RUN diff -u ${OPENWRT_CONFIG} ${OPENWRT_CONFIG}.new || true
 
-# Use sed to turn all modules (=m) into built-in (=y) - we don't ship packages, only the image (immutable firmware)
-RUN sed -i 's/=\(m\)/=y/g' .config
-RUN make defconfig
+FROM configured AS downloaded
 
-RUN ./scripts/diffconfig.sh > ${OPENWRT_CONFIG}.new
+RUN id openwrt
 
-RUN echo "Diff between provided config and final config used for build:"
-RUN diff -u ${OPENWRT_CONFIG} ${OPENWRT_CONFIG}.new || true
+# Show contents of dl cache
+RUN --mount=type=cache,id=openwrt_dl,target=/src/openwrt/dl,uid=1000 du -h -d 3 -x /src/openwrt/dl | sort -h
 
-FROM configured AS build
 # Download sources; as this can fail due to network issues, we retry a few times with decreasing parallelism
-RUN make download -j$(($(nproc)+2)) || make download -j4 || make download -j2 || make download || make download
+RUN --mount=type=cache,id=openwrt_dl,target=/src/openwrt/dl,uid=1000 { make download -j$(($(nproc)+2)) || make download -j4 || make download -j2 || make download || make download -j1 V=s; } && cp -pr /src/openwrt/dl /src/openwrt/dl_cached
+# Show sizes
+RUN du -h -d 3 -x . | sort -h
+# Move
+RUN rm -rf /src/openwrt/dl && mv /src/openwrt/dl_cached /src/openwrt/dl
+# Show sizes
+RUN du -h -d 3 -x . | sort -h
 
+FROM downloaded AS build
 # Now lets build parts of OpenWRT, we can't build everything in one go as caches would grow too big.
 # For each step, first do a parallel build with multiple cores; if it fails, build with -j1 V=s to get more verbose output so we know what broke in the GHA logs.
 
@@ -76,7 +93,10 @@ RUN make -j$(($(nproc)+2)) package/compile || make -j8 package/compile  || make 
 RUN make -j$(($(nproc)+2)) || make -j1 V=s
 
 # Show results with tree
-RUN tree -h bin
+# RUN tree -h  bin
+
+# Show results with du
+# RUN du -h -d 6 -x bin | sort -h
 
 # Decompress gzip, random MBR label-id, and compress with zstd
 RUN cp -v bin/targets/*/*/*.img.gz /dist && \
@@ -86,7 +106,30 @@ RUN cp -v bin/targets/*/*/*.img.gz /dist && \
     LABEL_ID="$(bash -c 'echo $(( RANDOM * 32768 + RANDOM ))')" && echo "random: $LABEL_ID" && \
     sfdisk --disk-id /dist/*.img "${LABEL_ID}" && \
     echo 'after:' && sfdisk -d /dist/*.img && \
-    zstdmt --rm /dist/*.img && ls -lah /dist/*.img*
+    zstdmt -9 --rm /dist/*.img && ls -lah /dist/*.img*
+
+ARG RELEASE_VERSION="00000000-0000"
+
+# If packages present, pack them into a tarball and ship them to /dist as well
+RUN <<HEREDOC
+# Packages will be in bin/targets/rockchip/armv8/packages - but the whole bin/targets/rockchip/armv8 (minus the .img.gz) is interesting to have
+# Grab the name of the image (resolve glob bin/targets/*/*/*.img.gz)
+image_name_full_base="$(basename $(ls bin/targets/*/*/*.img.gz | head -n1) .img.gz)"
+# remove the trailing -ext4-sysupgrade if present
+extras_name=${image_name_full_base%-ext4-sysupgrade}-extras-${RELEASE_VERSION}
+echo "Extras name: '${extras_name}'"
+rm -rfv bin/targets/*/*/*.img.gz bin/targets/*/*/kernel-debug.tar.zst # drop the image and debug files
+# Pack the rest into a tarball in /dist/${extras_name}-extra.tar.zst, with an intermediate dir also with extras_name
+tar -cf - -C bin/targets/rockchip/armv8 --transform "s|^|${extras_name}/|" . | zstdmt -9 -o /dist/${extras_name}.tar.zst
+ls -lah /dist/${extras_name}.tar.zst
+# list the contents of tarball
+#tar -tvf /dist/${extras_name}.tar.zst
+
+# Since we're here also rename the image output to contain the -${RELEASE_VERSION}
+mv /dist/${image_name_full_base}.img.zst /dist/${image_name_full_base}-${RELEASE_VERSION}.img.zst
+
+ls -lah /dist
+HEREDOC
 
 # Finally the output stage
 FROM alpine:3
