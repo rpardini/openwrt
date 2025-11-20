@@ -10,6 +10,7 @@ config system
 	option log_proto 'udp'
 	option conloglevel '8'
 	option cronloglevel '5'
+	option log_ip '192.168.66.171'
 
 config timeserver 'ntp'
 	list server '0.openwrt.pool.ntp.org'
