@@ -245,8 +245,10 @@ config host
 config host
 	option name 'cm3588-nas'
 	option ip '192.168.66.170'
-	list mac 'e2:aa:08:31:73:86'
 	option dns '1'
+	list tag 'tinkpxelinuxt6'
+	list mac 'E2:AA:08:31:73:86'
+	list mac '4e:08:b7:3f:77:04'
 
 config host
 	option name 'nanopct6-16gb-lts-lan1'
