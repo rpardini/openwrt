@@ -183,6 +183,7 @@ config host
 	option ip '192.168.66.87'
 	list mac '98:0E:24:74:8A:19'
 	option dns '1'
+	list tag 'tinkuefiarm64pxet6'
 
 config host
 	option name 'nanopi-r6c'
@@ -219,8 +220,10 @@ config host
 config host
 	option name 'blade3c'
 	option ip '192.168.66.123'
-	list mac '6E:34:31:63:50:5E'
 	option dns '1'
+	list tag 'tinkpxelinuxt6'
+	list mac '6E:34:31:63:50:5E'
+	list mac '52:7A:B6:3D:45:DB'
 
 config host
 	option name 'odroidm1'
@@ -240,7 +243,8 @@ config host
 	option name 'thinkpad-x13s-wifi'
 	option ip '192.168.66.144'
 	option dns '1'
-	list mac '00:03:7f:12:bd:f0'
+	list mac '00:03:7F:12:BD:F0'
+	list mac '00:03:7F:12:67:DE'
 
 config host
 	option name 'cm3588-nas'
