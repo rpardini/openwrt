@@ -222,8 +222,8 @@ config host
 	option ip '192.168.66.123'
 	option dns '1'
 	list tag 'tinkpxelinuxt6'
-	list mac '6E:34:31:63:50:5E'
 	list mac '52:7A:B6:3D:45:DB'
+	list mac '6e:63:6b:e3:01:3c'
 
 config host
 	option name 'odroidm1'
