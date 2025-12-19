@@ -305,3 +305,10 @@ config tag 'tinkuefipxe'
 	list dhcp_option '66,192.168.66.170'
 	list dhcp_option '67,ipxe.efi'
 
+config host
+	option name 'radxa-e24c'
+	option ip '192.168.66.86'
+	list mac '96:9E:F4:E0:24:97'
+	list tag 'tinkpxelinuxt6'
+	option dns '1'
+
