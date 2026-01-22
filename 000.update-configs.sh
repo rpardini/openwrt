@@ -6,7 +6,7 @@ set -x
 SRC_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SRC_DIR" || exit 2
 
-LOCAL_FILES_DIR="$(pwd)/files"
+LOCAL_FILES_DIR="$(pwd)/files_r5s"
 LOCAL_FILES_ETC_DIR="$LOCAL_FILES_DIR/etc"
 
 SOURCE_IP="192.168.66.1"
