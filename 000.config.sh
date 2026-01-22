@@ -2,5 +2,7 @@
 
 set -e
 
-docker buildx build --progress=plain -t openwrt:config --target configured .
-docker run -it -v "$(pwd):/host" openwrt:config /bin/bash -c "cd /src/openwrt && make menuconfig && ./scripts/diffconfig.sh > /host/diffconfig.r5s.final && echo done"
+declare target="${1:-"r5s"}"
+
+docker buildx build --build-arg "MACHINE_ID=${target}" --build-arg "OPENWRT_CONFIG=diffconfig.${target}.final" --progress=plain -t openwrt:config --target configured .
+docker run -it -v "$(pwd):/host" openwrt:config /bin/bash -c "cd /src/openwrt && make menuconfig && ./scripts/diffconfig.sh > /host/diffconfig.${target}.final && echo done"
