@@ -51,14 +51,14 @@ config host
 	option ip '192.168.66.10'
 	list mac 'D0:11:E5:1C:6F:D8'
 	option dns '1'
-	list tag 'pihole'
+	list tag 'pihole_disabled'
 
 config host
 	option name 'M4ProMiniWifi'
 	option ip '192.168.66.11'
 	list mac '36:81:6C:D6:87:8A'
 	option dns '1'
-	list tag 'pihole'
+	list tag 'pihole_disabled'
 
 config host
 	option name 'mixtile-edge2-wifi'
@@ -244,7 +244,6 @@ config host
 	option ip '192.168.66.144'
 	option dns '1'
 	list mac '00:03:7F:12:BD:F0'
-	list mac '00:03:7F:12:67:DE'
 
 config host
 	option name 'cm3588-nas'
@@ -284,15 +283,15 @@ config host
 	option name 'Pixel-9'
 	option ip '192.168.66.220'
 	list mac '4E:B2:3F:90:98:29'
-	list tag 'pihole'
 	option dns '1'
+	list tag 'pihole_disabled'
 
 config host
 	option name 'MacBookPro'
 	option ip '192.168.66.229'
 	list mac 'F6:F8:A2:D1:1C:E4'
-	list tag 'pihole'
 	option dns '1'
+	list tag 'pihole_disabled'
 
 config domain
 	option name 'tinkerbell'
@@ -311,4 +310,34 @@ config host
 	list mac '96:9E:F4:E0:24:97'
 	list tag 'tinkpxelinuxt6'
 	option dns '1'
+
+config host
+	option name 'mixtile-core3588e'
+	option ip '192.168.66.85'
+	list mac 'CE:68:8B:3A:8E:28'
+	list mac '26:d6:38:4b:54:3a'
+	list tag 'tinkpxelinuxt6'
+	option dns '1'
+
+config host
+	option name 'mekotronics-r58-4x4'
+	option ip '192.168.66.84'
+	list mac 'ea:72:73:83:a4:f5'
+	list tag 'tinkpxelinuxt6'
+	option dns '1'
+
+config host
+	option name 'radxa-nio-12l'
+	option ip '192.168.66.83'
+	list mac 'BE:C0:45:F1:A0:D2'
+	list tag 'tinkpxelinuxt6'
+	option dns '1'
+
+config host
+	option ip '192.168.66.82'
+	option name 'radxa-zero2-r8152-eth'
+	option dns '1'
+	list mac '0A:3B:67:ED:1A:59'
+	list mac '3c:18:a0:95:69:f7'
+	list tag 'tinkpxelinuxt6'
 
