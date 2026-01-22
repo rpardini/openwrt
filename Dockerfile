@@ -12,7 +12,6 @@ USER openwrt
 
 WORKDIR /src/openwrt
 COPY --chown=openwrt:root config config
-COPY --chown=openwrt:root files files
 COPY --chown=openwrt:root include include
 COPY --chown=openwrt:root LICENSES LICENSES
 COPY --chown=openwrt:root package package
@@ -22,6 +21,10 @@ COPY --chown=openwrt:root toolchain toolchain
 COPY --chown=openwrt:root tools tools
 COPY --chown=openwrt:root .gitattributes .gitignore BSDmakefile Config.in COPYING feeds.conf.default ./
 COPY --chown=openwrt:root Makefile rules.mk ./
+
+# Add the configuration files to be included in the image
+ARG MACHINE_ID="r5s"
+COPY --chown=openwrt:root files_${MACHINE_ID} files
 RUN ls -lah
 
 RUN <<HEREDOC
@@ -50,15 +53,6 @@ ARG OPENWRT_CONFIG=diffconfig.r5s.final
 ADD --chown=openwrt:root ${OPENWRT_CONFIG} ./
 RUN cp -v ${OPENWRT_CONFIG} .config
 RUN make defconfig
-
-## # we don't ship packages, only the image (immutable firmware)
-## # Use sed to turn all modules (CONFIG_xxx=m) into disabled "# CONFIG_xxx is not set"
-## RUN grep '=m' .config || true
-## RUN sed -i 's/^\(CONFIG_.*\)=m$/# \1 is not set/g' .config
-## RUN make defconfig
-## RUN ./scripts/diffconfig.sh > ${OPENWRT_CONFIG}.new
-## RUN echo "Diff between provided config and final config used for build:"
-## RUN diff -u ${OPENWRT_CONFIG} ${OPENWRT_CONFIG}.new || true
 
 ARG RELEASE_VERSION="00000000-0000"
 # In include/version.mk, replace all occurences of the string "24.10-SNAPSHOT" with "24.10.${RELEASE_VERSION}"
