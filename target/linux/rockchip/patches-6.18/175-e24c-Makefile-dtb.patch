@@ -1,0 +1,20 @@
+From aec07d831760e727fa028aa139c4e309c8a9f9d2 Mon Sep 17 00:00:00 2001
+From: Ricardo Pardini <ricardo@pardini.net>
+Date: Sat, 15 Aug 2026 20:35:27 +0200
+Subject: [PATCH 175/175] e24c Makefile dtb
+
+---
+ arch/arm64/boot/dts/rockchip/Makefile | 2 ++
+ 1 file changed, 2 insertions(+)
+
+--- a/arch/arm64/boot/dts/rockchip/Makefile
++++ b/arch/arm64/boot/dts/rockchip/Makefile
+@@ -93,6 +93,8 @@ dtb-$(CONFIG_ARCH_ROCKCHIP) += rk3528-ar
+ dtb-$(CONFIG_ARCH_ROCKCHIP) += rk3528-hinlink-h28k.dtb
+ dtb-$(CONFIG_ARCH_ROCKCHIP) += rk3528-nanopi-zero2.dtb
+ dtb-$(CONFIG_ARCH_ROCKCHIP) += rk3528-radxa-e20c.dtb
++dtb-$(CONFIG_ARCH_ROCKCHIP) += rk3528-radxa-e24c.dtb
++dtb-$(CONFIG_ARCH_ROCKCHIP) += rk3528-radxa-e24c-spi.dtb
+ dtb-$(CONFIG_ARCH_ROCKCHIP) += rk3528-rock-2a.dtb
+ dtb-$(CONFIG_ARCH_ROCKCHIP) += rk3528-rock-2f.dtb
+ dtb-$(CONFIG_ARCH_ROCKCHIP) += rk3562-evb2-v10.dtb
