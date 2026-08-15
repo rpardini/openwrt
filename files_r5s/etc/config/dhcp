@@ -241,7 +241,7 @@ config host
 	option ip '192.168.66.98'
 	list mac '00:1E:06:49:15:91'
 	option dns '1'
-	list tag 'tinkpxelinuxt6'
+	list tag 'tinkpxelinuxt6http'
 
 config host
 	option name 'mixtile-blade3-b'
@@ -259,17 +259,9 @@ config host
 	option name 'blade3c'
 	option ip '192.168.66.123'
 	option dns '1'
-	list tag 'tinkpxelinuxt6'
 	list mac '52:7A:B6:3D:45:DB'
 	list mac '6e:63:6b:e3:01:3c'
-
-config host
-	option name 'odroidm1'
-	option ip '192.168.66.124'
-	list mac 'FE:9B:E6:5C:7D:15'
-	option dns '1'
-	option hostid 'faceb00cb00b'
-	option duid '00020000ab11e76a979ba937eca8'
+	list tag 'tinkpxelinuxt6http'
 
 config host
 	option name 'mixtile-blade3-a'
@@ -287,7 +279,7 @@ config host
 	option name 'cm3588-nas'
 	option ip '192.168.66.170'
 	option dns '1'
-	list tag 'tinkpxelinuxt6'
+	list tag 'tinkpxelinuxt6http'
 	list mac 'E2:AA:08:31:73:86'
 	list mac '4e:08:b7:3f:77:04'
 
@@ -316,14 +308,43 @@ config host
 	list mac '0E:04:B6:19:DF:46'
 	option name 'mekotronics-r58x-pro-end1'
 	option dns '1'
-	list tag 'tinkpxelinuxt6'
+	list tag 'tinkpxelinuxt6http'
 
 config host
 	option ip '192.168.66.175'
 	list mac '0E:04:B6:19:DF:47'
 	option name 'mekotronics-r58x-pro-end0'
 	option dns '1'
-	list tag 'tinkpxelinuxt6'
+	list tag 'tinkpxelinuxt6http'
+
+config host
+	option ip '192.168.66.176'
+	list mac '66:48:47:3E:83:52'
+	option name 'recomputer-rk3576-devkit-end0'
+	option dns '1'
+	list tag 'tinkpxelinuxt6http'
+
+config host
+	option ip '192.168.66.177'
+	list mac '66:48:47:3E:83:53'
+	option name 'recomputer-rk3576-devkit-end1'
+	option dns '1'
+	list tag 'tinkpxelinuxt6http'
+
+
+config host
+	option ip '192.168.66.178'
+	list mac '2E:5B:DA:DC:D9:E9'
+	option name 'recomputer-rk3588-devkit-end0'
+	option dns '1'
+	list tag 'tinkpxelinuxt6http'
+
+config host
+	option ip '192.168.66.179'
+	list mac '2E:5B:DA:DC:D9:E8'
+	option name 'recomputer-rk3588-devkit-end1'
+	option dns '1'
+	list tag 'tinkpxelinuxt6http'
 
 config host
 	option name 'Pixel-9'
@@ -344,7 +365,7 @@ config domain
 	option ip '192.168.66.170'
 
 config tag 'pihole'
-	option dhcp_option '6,192.168.66.170'
+	option dhcp_option '6,192.168.66.175,192.168.66.176,192.168.66.123'
 
 config tag 'tinkuefipxe'
 	list dhcp_option '66,192.168.66.170'
