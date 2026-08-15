@@ -1,0 +1,37 @@
+From cc6073900b655776730bad59fa848749d7f4474e Mon Sep 17 00:00:00 2001
+From: Jonas Karlman <jonas@kwiboo.se>
+Date: Sun, 27 Jul 2025 18:02:58 +0000
+Subject: [PATCH 171/175] net: dsa: realtek: remove unused user_mii_bus from
+ realtek_priv
+
+user_mii_bus of struct realtek_priv is not dereferenced anywhere and it
+is easy to confuse it with user_mii_bus from struct dsa_switch, remove
+it.
+
+Signed-off-by: Jonas Karlman <jonas@kwiboo.se>
+---
+ drivers/net/dsa/realtek/realtek.h | 1 -
+ drivers/net/dsa/realtek/rtl83xx.c | 2 --
+ 2 files changed, 3 deletions(-)
+
+--- a/drivers/net/dsa/realtek/realtek.h
++++ b/drivers/net/dsa/realtek/realtek.h
+@@ -74,7 +74,6 @@ struct realtek_priv {
+ 	 * over FDB.
+ 	 */
+ 	struct mutex		l2_lock;
+-	struct mii_bus		*user_mii_bus;
+ 	struct mii_bus		*bus;
+ 	int			mdio_addr;
+ 
+--- a/drivers/net/dsa/realtek/rtl83xx.c
++++ b/drivers/net/dsa/realtek/rtl83xx.c
+@@ -104,8 +104,6 @@ int rtl83xx_setup_user_mdio(struct dsa_s
+ 		goto err_put_node;
+ 	}
+ 
+-	priv->user_mii_bus = bus;
+-
+ err_put_node:
+ 	of_node_put(mdio_np);
+ 
