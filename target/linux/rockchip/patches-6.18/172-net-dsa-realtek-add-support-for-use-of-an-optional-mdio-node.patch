@@ -1,0 +1,90 @@
+From 4224d904c8bc9c1f103217656d0d8e5e8ed90c0d Mon Sep 17 00:00:00 2001
+From: Jonas Karlman <jonas@kwiboo.se>
+Date: Sun, 27 Jul 2025 18:02:59 +0000
+Subject: [PATCH 172/175] net: dsa: realtek: add support for use of an optional
+ mdio node
+
+The dt-bindings schema for Realtek switches for unmanaged switches
+contains a restriction on use of a mdio child OF node for MDIO-connected
+switches, i.e.:
+
+  if:
+    required:
+      - reg
+  then:
+    not:
+      required:
+        - mdio
+    properties:
+      mdio: false
+
+However, the driver currently requires the existence of a mdio child OF
+node to successfully probe and properly function.
+
+Relax the requirement of a mdio child OF node and assign the dsa_switch
+user_mii_bus to allow a MDIO-connected switch to probe and function
+when a mdio child OF node is missing.
+
+Fixes: bba140a566ed ("net: dsa: realtek: use the same mii bus driver for both interfaces")
+Signed-off-by: Jonas Karlman <jonas@kwiboo.se>
+---
+ drivers/net/dsa/realtek/rtl83xx.c | 26 ++++++++++++++++++++++----
+ 1 file changed, 22 insertions(+), 4 deletions(-)
+
+--- a/drivers/net/dsa/realtek/rtl83xx.c
++++ b/drivers/net/dsa/realtek/rtl83xx.c
+@@ -1,5 +1,6 @@
+ // SPDX-License-Identifier: GPL-2.0+
+ 
++#include <linux/irqdomain.h>
+ #include <linux/module.h>
+ #include <linux/regmap.h>
+ #include <linux/of_mdio.h>
+@@ -66,7 +67,7 @@ static int rtl83xx_user_mdio_write(struc
+  * @ds: DSA switch associated with this user_mii_bus
+  *
+  * Registers the MDIO bus for built-in Ethernet PHYs, and associates it with
+- * the mandatory 'mdio' child OF node of the switch.
++ * the optional 'mdio' child OF node of the switch.
+  *
+  * Context: Can sleep.
+  * Return: 0 on success, negative value for failure.
+@@ -77,11 +78,14 @@ int rtl83xx_setup_user_mdio(struct dsa_s
+ 	struct device_node *mdio_np;
+ 	struct mii_bus *bus;
+ 	int ret = 0;
++	int irq;
++	int i;
+ 
+ 	mdio_np = of_get_child_by_name(priv->dev->of_node, "mdio");
+-	if (!mdio_np) {
+-		dev_err(priv->dev, "no MDIO bus node\n");
+-		return -ENODEV;
++	if (mdio_np && !of_device_is_available(mdio_np)) {
++		dev_err(priv->dev, "no available MDIO bus node\n");
++		ret = -ENODEV;
++		goto err_put_node;
+ 	}
+ 
+ 	bus = devm_mdiobus_alloc(priv->dev);
+@@ -97,6 +101,20 @@ int rtl83xx_setup_user_mdio(struct dsa_s
+ 	snprintf(bus->id, MII_BUS_ID_SIZE, "%s:user_mii", dev_name(priv->dev));
+ 	bus->parent = priv->dev;
+ 
++	if (!mdio_np) {
++		ds->user_mii_bus = bus;
++		bus->phy_mask = ~ds->phys_mii_mask;
++
++		if (priv->irqdomain) {
++			for (i = 0; i < priv->num_ports; i++) {
++				irq = irq_find_mapping(priv->irqdomain, i);
++				if (irq < 0)
++					continue;
++				bus->irq[i] = irq;
++			}
++		}
++	}
++
+ 	ret = devm_of_mdiobus_register(priv->dev, bus, mdio_np);
+ 	if (ret) {
+ 		dev_err(priv->dev, "unable to register MDIO bus %s\n",
