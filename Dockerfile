@@ -58,11 +58,13 @@ RUN cp -v ${OPENWRT_CONFIG} .config
 RUN make defconfig
 
 ARG RELEASE_VERSION="00000000-0000"
-# In include/version.mk, replace all occurences of the string "SNAPSHOT" with "${RELEASE_VERSION}"
+# In include/version.mk, replace all occurences of the string "SNAPSHOT" with "yy.mm-${RELEASE_VERSION}"
 RUN <<HEREDOC
 cp -v include/version.mk include/version.mk.orig
-echo "Setting release version to ${RELEASE_VERSION} in include/version.mk"
-sed -i "s/SNAPSHOT/${RELEASE_VERSION}/g" ./include/version.mk || true # do NOT fail
+YEAR_2_DIGITS=$(date +%y)
+MONTH_2_DIGITS=$(date +%m)
+echo "Setting release version to ${YEAR_2_DIGITS}.${MONTH_2_DIGITS}-${RELEASE_VERSION} in include/version.mk"
+sed -i "s/SNAPSHOT/${YEAR_2_DIGITS}.${MONTH_2_DIGITS}-${RELEASE_VERSION}/g" ./include/version.mk || true # do NOT fail
 diff -u include/version.mk.orig include/version.mk || true # do NOT fail
 rm include/version.mk.orig
 HEREDOC
