@@ -195,6 +195,13 @@ define U-Boot/radxa-e20c-rk3528
     radxa_e20c
 endef
 
+define U-Boot/radxa-e24c-rk3528
+  $(U-Boot/rk3528/Default)
+  NAME:=E24C
+  BUILD_DEVICES:= \
+    radxa_e24c
+endef
+
 define U-Boot/rock-2-rk3528
   $(U-Boot/rk3528/Default)
   NAME:=ROCK 2A/2F
@@ -458,6 +465,7 @@ UBOOT_TARGETS := \
   rock-pi-e-v3-rk3328 \
   hinlink-h28k-rk3528 \
   radxa-e20c-rk3528 \
+  radxa-e24c-rk3528 \
   rock-2-rk3528 \
   nanopi-r3s-rk3566 \
   radxa-cm3-io-rk3566 \

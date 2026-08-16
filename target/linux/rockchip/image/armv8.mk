@@ -281,6 +281,16 @@ define Device/radxa_e20c
 endef
 TARGET_DEVICES += radxa_e20c
 
+define Device/radxa_e24c
+  $(Device/rk3528)
+  DEVICE_VENDOR := Radxa
+  DEVICE_MODEL := E24C
+  DEVICE_DTS := rk3528-radxa-e24c-spi
+  UBOOT_DEVICE_NAME := radxa-e24c-rk3528
+  DEVICE_PACKAGES := kmod-button-hotplug kmod-input-adc-keys kmod-dsa-rtl8365mb blkdiscard block-mount kmod-nvme kmod-usb-net-cdc-ncm kmod-usb-net-rndis
+endef
+TARGET_DEVICES += radxa_e24c
+
 define Device/radxa_e25
   $(Device/rk3568)
   DEVICE_VENDOR := Radxa
