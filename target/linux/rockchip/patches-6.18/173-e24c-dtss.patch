@@ -51,7 +51,7 @@ Subject: [PATCH 173/175] e24c dtss
 +};
 --- /dev/null
 +++ b/arch/arm64/boot/dts/rockchip/rk3528-radxa-e24c.dts
-@@ -0,0 +1,574 @@
+@@ -0,0 +1,571 @@
 +// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
 +
 +/dts-v1/;
@@ -69,6 +69,10 @@ Subject: [PATCH 173/175] e24c dtss
 +		i2c0 = &i2c0;
 +		i2c1 = &i2c1;
 +		i2c5 = &i2c5;
++		led-boot = &sys_led;
++		led-failsafe = &sys_led;
++		led-running = &sys_led;
++		led-upgrade = &sys_led;
 +		mmc0 = &sdhci;
 +		mmc1 = &sdmmc;
 +		rtc0 = &hym8563;
@@ -110,13 +114,11 @@ Subject: [PATCH 173/175] e24c dtss
 +	leds {
 +		compatible = "gpio-leds";
 +
-+		led-0 {
++		sys_led: led-0 {
 +			color = <LED_COLOR_ID_GREEN>;
 +			default-state = "on";
-+			function = LED_FUNCTION_HEARTBEAT;
++			function = LED_FUNCTION_STATUS;
 +			gpios = <&gpio4 RK_PA1 GPIO_ACTIVE_LOW>;
-+			label = "SYS";
-+			linux,default-trigger = "heartbeat";
 +			pinctrl-names = "default";
 +			pinctrl-0 = <&sys_led_g>;
 +		};
@@ -126,8 +128,6 @@ Subject: [PATCH 173/175] e24c dtss
 +			default-state = "off";
 +			function = LED_FUNCTION_WAN;
 +			gpios = <&gpio4 RK_PA0 GPIO_ACTIVE_HIGH>;
-+			label = "WAN";
-+			linux,default-trigger = "stmmac-0:1d:user_mii:00:link";
 +			pinctrl-names = "default";
 +			pinctrl-0 = <&wan_led_g>;
 +		};
@@ -136,9 +136,8 @@ Subject: [PATCH 173/175] e24c dtss
 +			color = <LED_COLOR_ID_GREEN>;
 +			default-state = "off";
 +			function = LED_FUNCTION_LAN;
++			function-enumerator = <1>;
 +			gpios = <&gpio1 RK_PB0 GPIO_ACTIVE_HIGH>;
-+			label = "LAN1";
-+			linux,default-trigger = "stmmac-0:1d:user_mii:01:link";
 +			pinctrl-names = "default";
 +			pinctrl-0 = <&lan1_led_g>;
 +		};
@@ -147,9 +146,8 @@ Subject: [PATCH 173/175] e24c dtss
 +			color = <LED_COLOR_ID_GREEN>;
 +			default-state = "off";
 +			function = LED_FUNCTION_LAN;
++			function-enumerator = <2>;
 +			gpios = <&gpio1 RK_PB1 GPIO_ACTIVE_HIGH>;
-+			label = "LAN2";
-+			linux,default-trigger = "stmmac-0:1d:user_mii:02:link";
 +			pinctrl-names = "default";
 +			pinctrl-0 = <&lan2_led_g>;
 +		};
@@ -158,9 +156,8 @@ Subject: [PATCH 173/175] e24c dtss
 +			color = <LED_COLOR_ID_GREEN>;
 +			default-state = "off";
 +			function = LED_FUNCTION_LAN;
++			function-enumerator = <3>;
 +			gpios = <&gpio1 RK_PB4 GPIO_ACTIVE_HIGH>;
-+			label = "LAN3";
-+			linux,default-trigger = "stmmac-0:1d:user_mii:03:link";
 +			pinctrl-names = "default";
 +			pinctrl-0 = <&lan3_led_g>;
 +		};
