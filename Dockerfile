@@ -2,6 +2,9 @@ FROM debian:stable AS configured
 
 # Install dependencies for building OpenWRT, plus utils for compression and randomizing MBR label-id
 ENV DEBIAN_FRONTEND=noninteractive
+
+# Enable trixie-backports for golang-1.26
+RUN echo "deb http://deb.debian.org/debian trixie-backports main" > /etc/apt/sources.list.d/trixie-backports.list
 RUN apt -y update && apt -y install build-essential git make tree unzip wget file curl gawk python3 python3-dev rsync \
                                     libncurses5-dev python3-pyelftools python3-setuptools swig golang-go \
                                     fdisk zstd
