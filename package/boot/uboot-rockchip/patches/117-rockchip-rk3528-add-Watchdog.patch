@@ -1,0 +1,26 @@
+From 9667b5e112994637453cb2faaebdd541a7327014 Mon Sep 17 00:00:00 2001
+From: Ricardo Pardini <ricardo@pardini.net>
+Date: Thu, 13 Aug 2026 15:37:57 +0200
+Subject: [PATCH 117/120] rockchip: rk3528: add Watchdog
+
+---
+ dts/upstream/src/arm64/rockchip/rk3528.dtsi | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+--- a/dts/upstream/src/arm64/rockchip/rk3528.dtsi
++++ b/dts/upstream/src/arm64/rockchip/rk3528.dtsi
+@@ -1057,6 +1057,14 @@
+ 			status = "disabled";
+ 		};
+ 
++		wdt: watchdog@ffac0000 {
++			compatible = "rockchip,rk3528-wdt", "snps,dw-wdt";
++			reg = <0x0 0xffac0000 0x0 0x100>;
++			clocks = <&cru TCLK_WDT_NS>, <&cru PCLK_WDT_NS>;
++			clock-names = "tclk", "pclk";
++			interrupts = <GIC_SPI 28 IRQ_TYPE_LEVEL_HIGH>;
++		};
++
+ 		saradc: adc@ffae0000 {
+ 			compatible = "rockchip,rk3528-saradc";
+ 			reg = <0x0 0xffae0000 0x0 0x10000>;
