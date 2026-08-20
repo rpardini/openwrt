@@ -4,10 +4,14 @@ set -e
 
 declare target="${1:-"r5s"}"
 
-# The image has no .git, so resolve these here and pass them in; see the build stage in Dockerfile.
-declare openwrt_revision openwrt_source_date_epoch
-openwrt_revision="$(./scripts/getver.sh)"
-openwrt_source_date_epoch="$(./scripts/get_source_date_epoch.sh)"
+# The image has no .git, so REVISION/SOURCE_DATE_EPOCH are handed in; see the build stage in Dockerfile.
+# Keep these CONSTANT: they sit in front of the toolchain/kernel/package layers, so deriving them from
+# git would throw away the whole build cache on every commit. The tail after the '-' must be hex digits.
+# For an image that identifies its real source revision, override with:
+#   openwrt_revision="$(./scripts/getver.sh)"
+#   openwrt_source_date_epoch="$(./scripts/get_source_date_epoch.sh)"
+declare openwrt_revision="${OPENWRT_REVISION:-"r0-c0ffee"}"
+declare openwrt_source_date_epoch="${OPENWRT_SOURCE_DATE_EPOCH:-"1767225600"}"
 echo "REVISION: ${openwrt_revision} SOURCE_DATE_EPOCH: ${openwrt_source_date_epoch}"
 
 docker buildx build \
