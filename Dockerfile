@@ -90,9 +90,15 @@ FROM downloaded AS build
 # There is no .git in the image (see .dockerignore), so getver.sh would yield REVISION=unknown and
 # get_source_date_epoch.sh would fall back to the current time. That makes base-files' version
 # "<commitcount>~unknown", which apk rejects: the field after '~' must be a hex commit hash.
-# Both scripts check these file overrides before trying git, so feed them values from the host.
-ARG OPENWRT_REVISION
-ARG OPENWRT_SOURCE_DATE_EPOCH
+# Both scripts check these file overrides before trying git, so hand them values here.
+#
+# These are deliberately CONSTANT, not derived from git: this layer sits in front of the toolchain,
+# kernel and package builds, so a value that moved with every commit would invalidate all of them.
+# The tail after the '-' is what ends up in the apk version, so it must be hex digits.
+# CI can override both with real values (`./scripts/getver.sh`, `./scripts/get_source_date_epoch.sh`)
+# when it wants an image that identifies its own source revision.
+ARG OPENWRT_REVISION="r0-c0ffee"
+ARG OPENWRT_SOURCE_DATE_EPOCH="1767225600"
 RUN <<HEREDOC
 set -e
 [ -n "${OPENWRT_REVISION}" ] || { echo "OPENWRT_REVISION build-arg is empty" >&2; exit 1; }
