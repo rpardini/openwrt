@@ -152,40 +152,57 @@ RUN make -j$(($(nproc)+2)) || make -j1 V=s
 # Show results with du
 # RUN du -h -d 6 -x bin | sort -h
 
-# Decompress gzip, random MBR label-id, and compress with zstd
-RUN cp -v bin/targets/*/*/*.img.gz /dist && \
-    ls -lah /dist/*.img.gz && \
-    gunzip /dist/*.img.gz || true && \
-    echo 'before: ' && sfdisk -d /dist/*.img && \
-    LABEL_ID="$(bash -c 'echo $(( RANDOM * 32768 + RANDOM ))')" && echo "random: $LABEL_ID" && \
-    sfdisk --disk-id /dist/*.img "${LABEL_ID}" && \
-    echo 'after:' && sfdisk -d /dist/*.img && \
-    zstdmt -9 --rm /dist/*.img && ls -lah /dist/*.img*
+### --------------------------------------------------------------------------------------------------------------------
+### Per-board image stages. Everything above this line is board-agnostic: all three boards are rockchip/armv8, so they
+### share the same toolchain, kernel and packages, and their diffconfigs differ only in the selected device (plus a
+### handful of packages on e24c). Each stage below just re-points .config at its board, swaps the files/ overlay and
+### re-runs the image build; they do not depend on each other, so buildx builds them in parallel.
+###
+### Two variants per board:
+###   custom  - files_<board> overlaid: rpardini's authorized_keys, frr/dnsmasq/rc.local config, ...
+###   generic - no files/ overlay at all, for anyone else's use
+###
+### The extras tarball only comes out of the custom stages: its contents do not depend on the files/ overlay, so
+### shipping one per variant would just double the upload. Append --extras to a generic stage to get one anyway.
+### --------------------------------------------------------------------------------------------------------------------
 
+FROM build AS image-common
+COPY --chown=openwrt:root docker/build-image.sh docker/
+COPY --chown=openwrt:root diffconfig.e24c.final diffconfig.r5s.final diffconfig.r6c.final ./
+COPY --chown=openwrt:root files_e24c files_e24c
+COPY --chown=openwrt:root files_r5s files_r5s
+COPY --chown=openwrt:root files_r6c files_r6c
+
+FROM image-common AS image-e24c-custom
 ARG RELEASE_VERSION="00000000-0000"
+RUN ./docker/build-image.sh e24c custom "${RELEASE_VERSION}" --extras
 
-# If packages present, pack them into a tarball and ship them to /dist as well
-RUN <<HEREDOC
-# Packages will be in bin/targets/rockchip/armv8/packages - but the whole bin/targets/rockchip/armv8 (minus the .img.gz) is interesting to have
-# Grab the name of the image (resolve glob bin/targets/*/*/*.img.gz)
-image_name_full_base="$(basename $(ls bin/targets/*/*/*.img.gz | head -n1) .img.gz)"
-# remove the trailing -ext4-sysupgrade if present
-extras_name=${image_name_full_base%-ext4-sysupgrade}-extras-${RELEASE_VERSION}
-echo "Extras name: '${extras_name}'"
-rm -rfv bin/targets/*/*/*.img.gz bin/targets/*/*/kernel-debug.tar.zst # drop the image and debug files
-# Pack the rest into a tarball in /dist/${extras_name}-extra.tar.zst, with an intermediate dir also with extras_name
-tar -cf - -C bin/targets/rockchip/armv8 --transform "s|^|${extras_name}/|" . | zstdmt -9 -o /dist/${extras_name}.tar.zst
-ls -lah /dist/${extras_name}.tar.zst
-# list the contents of tarball
-#tar -tvf /dist/${extras_name}.tar.zst
+FROM image-common AS image-e24c-generic
+ARG RELEASE_VERSION="00000000-0000"
+RUN ./docker/build-image.sh e24c generic "${RELEASE_VERSION}"
 
-# Since we're here also rename the image output to contain the -${RELEASE_VERSION}
-mv /dist/${image_name_full_base}.img.zst /dist/${image_name_full_base}-${RELEASE_VERSION}.img.zst
+FROM image-common AS image-r5s-custom
+ARG RELEASE_VERSION="00000000-0000"
+RUN ./docker/build-image.sh r5s custom "${RELEASE_VERSION}" --extras
 
-ls -lah /dist
-HEREDOC
+FROM image-common AS image-r5s-generic
+ARG RELEASE_VERSION="00000000-0000"
+RUN ./docker/build-image.sh r5s generic "${RELEASE_VERSION}"
 
-# Finally the output stage
+FROM image-common AS image-r6c-custom
+ARG RELEASE_VERSION="00000000-0000"
+RUN ./docker/build-image.sh r6c custom "${RELEASE_VERSION}" --extras
+
+FROM image-common AS image-r6c-generic
+ARG RELEASE_VERSION="00000000-0000"
+RUN ./docker/build-image.sh r6c generic "${RELEASE_VERSION}"
+
+# Finally the output stage, collecting what every board/variant stage shipped to /dist
 FROM alpine:3
 WORKDIR /out
-COPY --from=build /dist/* /out/
+COPY --from=image-e24c-custom /dist/ /out/
+COPY --from=image-e24c-generic /dist/ /out/
+COPY --from=image-r5s-custom /dist/ /out/
+COPY --from=image-r5s-generic /dist/ /out/
+COPY --from=image-r6c-custom /dist/ /out/
+COPY --from=image-r6c-generic /dist/ /out/
