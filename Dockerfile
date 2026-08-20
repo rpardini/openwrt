@@ -118,6 +118,28 @@ RUN make -j$(($(nproc)+2)) toolchain/install || make toolchain/install -j1 V=s
 # Build the kernel
 RUN make -j$(($(nproc)+2)) target/linux/compile || make target/linux/compile -j1 V=s
 
+# Work around a python3 host-build breakage in the packages feed.
+# Feed commit d883c02a ("python3: pin host curses to the SDK's narrow ncurses") forces every curses
+# header check in CPython's configure to "no", but it also added ncurses/host to HOST_BUILD_DEPENDS -
+# so pkg-config still finds hostpkg's ncursesw and configure still enables the _curses module.
+# Include/py_curses.h then includes no curses header at all (all its HAVE_*CURSES*_H are off) and
+# Modules/_cursesmodule.c fails to compile, taking the whole PGO host build down with it.
+# The host python has no use for curses, so disable the modules outright - the same way the feed
+# already disables _tkinter.
+# Kept here, and not next to the feeds install, on purpose: this layer sits after the toolchain and
+# kernel builds, so applying it does not invalidate those (expensive) cached layers.
+RUN <<HEREDOC
+set -e
+py3_makefile=feeds/packages/lang/python/python3/Makefile
+if grep -q 'py_cv_module__curses' "${py3_makefile}"; then
+	echo "python3 feed already disables _curses for the host build; nothing to do"
+else
+	grep -q 'py_cv_module__tkinter=n/a' "${py3_makefile}" || { echo "python3 feed Makefile no longer has the expected anchor, curses workaround needs a look" >&2; exit 1; }
+	sed -i 's|py_cv_module__tkinter=n/a|py_cv_module__tkinter=n/a \\\n\tpy_cv_module__curses=n/a \\\n\tpy_cv_module__curses_panel=n/a|' "${py3_makefile}"
+fi
+grep -n -A 4 '^HOST_CONFIGURE_VARS' "${py3_makefile}"
+HEREDOC
+
 # Build the packages
 RUN make -j$(($(nproc)+2)) package/compile || make package/compile -j1 V=s
 
