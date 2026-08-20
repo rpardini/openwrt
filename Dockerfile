@@ -86,6 +86,23 @@ RUN rm -rf /src/openwrt/dl && mv /src/openwrt/dl_cached /src/openwrt/dl
 RUN du -h -d 3 -x . | sort -h
 
 FROM downloaded AS build
+
+# There is no .git in the image (see .dockerignore), so getver.sh would yield REVISION=unknown and
+# get_source_date_epoch.sh would fall back to the current time. That makes base-files' version
+# "<commitcount>~unknown", which apk rejects: the field after '~' must be a hex commit hash.
+# Both scripts check these file overrides before trying git, so feed them values from the host.
+ARG OPENWRT_REVISION
+ARG OPENWRT_SOURCE_DATE_EPOCH
+RUN <<HEREDOC
+set -e
+[ -n "${OPENWRT_REVISION}" ] || { echo "OPENWRT_REVISION build-arg is empty" >&2; exit 1; }
+[ -n "${OPENWRT_SOURCE_DATE_EPOCH}" ] || { echo "OPENWRT_SOURCE_DATE_EPOCH build-arg is empty" >&2; exit 1; }
+echo "${OPENWRT_REVISION}" > version
+echo "${OPENWRT_SOURCE_DATE_EPOCH}" > version.date
+echo "REVISION: $(./scripts/getver.sh)"
+echo "SOURCE_DATE_EPOCH: $(./scripts/get_source_date_epoch.sh)"
+HEREDOC
+
 # Now lets build parts of OpenWRT, we can't build everything in one go as caches would grow too big.
 # For each step, first do a parallel build with multiple cores; if it fails, build with -j1 V=s to get more verbose output so we know what broke in the GHA logs.
 
