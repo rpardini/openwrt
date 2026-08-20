@@ -157,7 +157,6 @@ CONFIG_PACKAGE_findutils-find=y
 CONFIG_PACKAGE_findutils-locate=y
 CONFIG_PACKAGE_findutils-xargs=y
 CONFIG_PACKAGE_fio=y
-CONFIG_PACKAGE_fish=y
 CONFIG_PACKAGE_flock=y
 CONFIG_PACKAGE_frr=y
 CONFIG_PACKAGE_frr-bfdd=y
