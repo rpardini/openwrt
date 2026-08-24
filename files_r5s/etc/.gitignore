@@ -23,3 +23,5 @@ config/ubootenv
 config/wifi_schedule
 config/wireless
 dropbear/dropbear_*_host_key
+config/luci-wol
+config/luci_plugins

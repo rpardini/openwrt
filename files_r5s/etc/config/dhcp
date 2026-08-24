@@ -32,11 +32,11 @@ config dhcp 'wan'
 	option ignore '1'
 
 config odhcpd 'odhcpd'
-	option maindhcp '0'
-	option leasefile '/tmp/hosts/odhcpd'
+	option leasefile '/tmp/odhcpd.leases'
 	option leasetrigger '/usr/sbin/odhcpd-update'
 	option loglevel '4'
-	option piofolder '/tmp/odhcpd-piofolder'
+	option piodir '/tmp/odhcpd-piodir'
+	option hostsdir '/tmp/hosts'
 
 config domain
 	option name 'kodi-fileserver.fritz.box'
@@ -331,7 +331,6 @@ config host
 	option dns '1'
 	list tag 'tinkpxelinuxt6http'
 
-
 config host
 	option ip '192.168.66.178'
 	list mac '2E:5B:DA:DC:D9:E9'
@@ -365,7 +364,7 @@ config domain
 	option ip '192.168.66.170'
 
 config tag 'pihole'
-	option dhcp_option '6,192.168.66.175,192.168.66.176,192.168.66.123'
+	list dhcp_option '6,192.168.66.175,192.168.66.176,192.168.66.123'
 
 config tag 'tinkuefipxe'
 	list dhcp_option '66,192.168.66.170'
