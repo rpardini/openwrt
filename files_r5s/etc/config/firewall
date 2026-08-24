@@ -32,6 +32,7 @@ config rule
 	option dest_port '68'
 	option target 'ACCEPT'
 	option family 'ipv4'
+	option enabled '1'
 
 config rule
 	option name 'Allow-Ping'
@@ -40,6 +41,7 @@ config rule
 	option icmp_type 'echo-request'
 	option family 'ipv4'
 	option target 'ACCEPT'
+	option enabled '1'
 
 config rule
 	option name 'Allow-IGMP'
@@ -47,6 +49,7 @@ config rule
 	option proto 'igmp'
 	option family 'ipv4'
 	option target 'ACCEPT'
+	option enabled '1'
 
 config rule
 	option name 'Allow-DHCPv6'
@@ -55,6 +58,7 @@ config rule
 	option dest_port '546'
 	option family 'ipv6'
 	option target 'ACCEPT'
+	option enabled '1'
 
 config rule
 	option name 'Allow-MLD'
@@ -67,6 +71,7 @@ config rule
 	list icmp_type '143/0'
 	option family 'ipv6'
 	option target 'ACCEPT'
+	option enabled '1'
 
 config rule
 	option name 'Allow-ICMPv6-Input'
@@ -86,6 +91,7 @@ config rule
 	option limit '1000/sec'
 	option family 'ipv6'
 	option target 'ACCEPT'
+	option enabled '1'
 
 config rule
 	option name 'Allow-ICMPv6-Forward'
@@ -102,6 +108,7 @@ config rule
 	option limit '1000/sec'
 	option family 'ipv6'
 	option target 'ACCEPT'
+	option enabled '1'
 
 config rule
 	option name 'Allow-IPSec-ESP'
@@ -109,6 +116,7 @@ config rule
 	option dest 'lan'
 	option proto 'esp'
 	option target 'ACCEPT'
+	option enabled '1'
 
 config rule
 	option name 'Allow-ISAKMP'
@@ -117,33 +125,7 @@ config rule
 	option dest_port '500'
 	option proto 'udp'
 	option target 'ACCEPT'
-
-config rule
-	option name 'allow-ipv6-ingress-to-vim3-port-80'
-	option family 'ipv6'
-	option src '*'
-	option dest 'lan'
-	list dest_ip '2a02:a466:4d7a::cafe:babe'
-	option dest_port '80'
-	option target 'ACCEPT'
-
-config rule
-	option name 'allow-ipv6-ingress-to-vim3-port-443'
-	option family 'ipv6'
-	option dest 'lan'
-	list dest_ip '2a02:a466:4d7a::cafe:babe'
-	option dest_port '443'
-	option target 'ACCEPT'
-	option src '*'
-
-config rule
-	option name 'allow-ipv6-ingress-to-vim3-port-22'
-	option src '*'
-	option dest 'lan'
-	list dest_ip '2a02:a466:4d7a::cafe:babe'
-	option dest_port '22'
-	option target 'ACCEPT'
-	option family 'ipv6'
+	option enabled '1'
 
 config rule
 	option name 'allow-ipv6-c0de-port-443'
@@ -153,6 +135,7 @@ config rule
 	list dest_ip '2a02:a466:4d7a::c0de'
 	option dest_port '443'
 	option target 'ACCEPT'
+	option enabled '1'
 
 config rule
 	option name 'allow-ipv6-c0de-port-80'
@@ -162,6 +145,7 @@ config rule
 	list dest_ip '2a02:a466:4d7a::c0de'
 	option dest_port '80'
 	option target 'ACCEPT'
+	option enabled '1'
 
 config rule
 	option name 'allow-ipv4-public-port-443'
@@ -171,6 +155,7 @@ config rule
 	option dest_port '443'
 	option target 'ACCEPT'
 	option family 'ipv4'
+	option enabled '1'
 
 config rule
 	option name 'allow-ipv4-public-port-80'
@@ -180,4 +165,5 @@ config rule
 	list dest_ip '195.240.102.13'
 	option dest_port '80'
 	option target 'ACCEPT'
+	option enabled '1'
 
