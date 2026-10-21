@@ -11,6 +11,8 @@ config system
 	option conloglevel '8'
 	option cronloglevel '5'
 	option clock_hourcycle 'h23'
+	option log_ip '192.168.76.80'
+	option log_port '1514'
 
 config timeserver 'ntp'
 	list server '0.openwrt.pool.ntp.org'

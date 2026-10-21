@@ -113,11 +113,37 @@ config host
 	option dns '1'
 
 config host
+	option ip '192.168.66.25'
+	list mac '92:af:60:a4:82:d9'
+	option name 'aml-c400-plus-eth'
+	option dns '1'
+	list tag 'tinkpxelinuxt6http'
+
+config host
+	option name 'aml-c400-plus-wifi'
+	option ip '192.168.66.26'
+	list mac '94:e0:d6:02:ae:60'
+	option dns '1'
+	list tag 'tinkpxelinuxt6http'
+
+config host
 	option name 't95z'
 	option ip '192.168.66.27'
 	list mac 'EA:DA:5C:76:8D:09'
 	option dns '1'
 	list tag 'tinkpxelinuxt6http'
+
+config host
+	option name 'Power-Strip-4-Gen4-X001'
+	option ip '192.168.66.31'
+	list mac '98:a3:16:7b:74:7c'
+	option dns '1'
+
+config host
+	option name 'Power-Strip-4-Gen4-X002-TVRack-Upper'
+	option ip '192.168.66.32'
+	list mac '20:6e:f1:02:6f:c8'
+	option dns '1'
 
 config host
 	option name 'nullpointer-onboard'
@@ -338,7 +364,6 @@ config host
 	option ip '192.168.66.221'
 	list mac '72:5B:B2:8C:5D:96'
 	option dns '1'
-	list tag 'pihole'
 
 config host
 	option ip '192.168.66.222'
@@ -366,7 +391,7 @@ config domain
 	option ip '192.168.66.170'
 
 config tag 'pihole'
-	list dhcp_option '6,192.168.66.176,192.168.66.170,192.168.66.175,192.168.66.178'
+	list dhcp_option '6,192.168.76.53'
 
 config tag 'tinkuefipxe'
 	list dhcp_option '66,192.168.66.170'
