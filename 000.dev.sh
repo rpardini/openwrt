@@ -13,6 +13,7 @@
 #   ./000.dev.sh image <board> <custom|generic>  # sync + docker/build-image.sh; result in ./out/dev
 #   ./000.dev.sh sync | shell | logs <pkg> | reset
 #
+# Output is also teed to logs-dev-<command>-<timestamp>.txt (logs-dev-latest.txt = newest); `shell` is not logged.
 # DEV_BOARD (default r5s) picks diffconfig.<board>.final as the tree's .config; it's re-applied when that file changes.
 
 set -o errexit -o pipefail -o nounset
@@ -20,6 +21,16 @@ set -o errexit -o pipefail -o nounset
 declare SRC_DIR
 SRC_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "${SRC_DIR}"
+
+# Everything but the interactive shell is also teed to ./logs-dev-<command>-<timestamp>.txt (gitignored via /logs-*.txt),
+# with logs-dev-latest.txt pointing at the newest one. Re-exec'd through tee so the exit status is the command's own.
+if [[ -z "${DEV_LOGGING:-}" && "${1:-}" != "shell" ]]; then
+	declare logfile="logs-dev-${1:-help}-$(date +%Y%m%d-%H%M%S).txt"
+	ln -sf "${logfile}" logs-dev-latest.txt
+	echo "==> logging to ${logfile}"
+	DEV_LOGGING=1 "${BASH_SOURCE[0]}" "$@" 2>&1 | tee "${logfile}"
+	exit "${PIPESTATUS[0]}"
+fi
 
 declare -r builder="openwrt-unlimited-logs" # see 000.build.sh
 declare -r base_image="openwrt-dev-base"
