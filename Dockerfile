@@ -123,7 +123,7 @@ RUN --mount=type=bind,source=docker/make-retry.sh,target=/tmp/make-retry.sh bash
 
 ### --------------------------------------------------------------------------------------------------------------------
 ### Per-board image stages. Everything above this line is board-agnostic: all boards are rockchip/armv8, so they
-### share the same toolchain, kernel and packages, and their diffconfigs differ only in the selected device. Each stage below
+### share the same toolchain, kernel and packages, and their diffconfigs differ only in the selected device (a one-line diffconfig.<board>.delta on top of the r5s base). Each stage below
 ### just re-points .config at its board, swaps the files/ overlay and re-runs the image build; they do not depend on each other, so buildx builds them in parallel.
 ###
 ### Two variants per board:
@@ -135,8 +135,8 @@ RUN --mount=type=bind,source=docker/make-retry.sh,target=/tmp/make-retry.sh bash
 ### --------------------------------------------------------------------------------------------------------------------
 
 FROM build AS image-common
-COPY --chown=openwrt:root docker/build-image.sh docker/make-retry.sh docker/
-COPY --chown=openwrt:root diffconfig.e24c.final diffconfig.r5s.final diffconfig.r6c.final ./
+COPY --chown=openwrt:root docker/build-image.sh docker/make-retry.sh docker/compose-config.sh docker/
+COPY --chown=openwrt:root diffconfig.r5s.final diffconfig.e24c.delta diffconfig.r6c.delta ./
 COPY --chown=openwrt:root files_e24c files_e24c
 COPY --chown=openwrt:root files_r5s files_r5s
 COPY --chown=openwrt:root files_r6c files_r6c

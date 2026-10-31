@@ -9,7 +9,7 @@
 
 set -o errexit -o pipefail -o nounset
 
-declare board="${1}"           # e24c | r5s | r6c; picks diffconfig.<board>.final and files_<board>
+declare board="${1}"           # e24c | r5s | r6c; picks diffconfig.<board>.delta (on top of the r5s base) and files_<board>
 declare variant="${2}"         # custom: overlay files_<board>; generic: no overlay at all
 declare release_version="${3}" # ends up in the names of the shipped files
 declare extras="${4:-}"        # --extras: also pack up bin/targets into a tarball
@@ -18,7 +18,7 @@ declare target_dir="bin/targets/rockchip/armv8"
 declare log_prefix="==> [${board}/${variant}]"
 
 echo "${log_prefix} configuring"
-cp -v "diffconfig.${board}.final" .config
+./docker/compose-config.sh "${board}" > .config
 make defconfig
 
 # The files/ overlay the shared stage was seeded with is whatever board 000.build.sh was invoked
