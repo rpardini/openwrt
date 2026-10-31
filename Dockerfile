@@ -87,80 +87,33 @@ RUN du -h -d 3 -x . | sort -h
 
 FROM downloaded AS build
 
-# There is no .git in the image (see .dockerignore), so getver.sh would yield REVISION=unknown and
-# get_source_date_epoch.sh would fall back to the current time. That makes base-files' version
-# "<commitcount>~unknown", which apk rejects: the field after '~' must be a hex commit hash.
-# Both scripts check these file overrides before trying git, so hand them values here.
-#
-# These are deliberately CONSTANT, not derived from git: this layer sits in front of the toolchain,
-# kernel and package builds, so a value that moved with every commit would invalidate all of them.
-# The tail after the '-' is what ends up in the apk version, so it must be hex digits.
-# CI can override both with real values (`./scripts/getver.sh`, `./scripts/get_source_date_epoch.sh`)
-# when it wants an image that identifies its own source revision.
+# There is no .git in the image (see .dockerignore); docker/stamp-version.sh hands getver.sh and
+# get_source_date_epoch.sh constant values instead, see the comments there.
 ARG OPENWRT_REVISION="r0-c0ffee"
 ARG OPENWRT_SOURCE_DATE_EPOCH="1767225600"
-RUN <<HEREDOC
-set -e
-[ -n "${OPENWRT_REVISION}" ] || { echo "OPENWRT_REVISION build-arg is empty" >&2; exit 1; }
-[ -n "${OPENWRT_SOURCE_DATE_EPOCH}" ] || { echo "OPENWRT_SOURCE_DATE_EPOCH build-arg is empty" >&2; exit 1; }
-echo "${OPENWRT_REVISION}" > version
-echo "${OPENWRT_SOURCE_DATE_EPOCH}" > version.date
-echo "REVISION: $(./scripts/getver.sh)"
-echo "SOURCE_DATE_EPOCH: $(./scripts/get_source_date_epoch.sh)"
-HEREDOC
+RUN --mount=type=bind,source=docker/stamp-version.sh,target=/tmp/stamp-version.sh bash /tmp/stamp-version.sh
 
 # Now lets build parts of OpenWRT, we can't build everything in one go as caches would grow too big.
-# For each step, first do a parallel build with multiple cores; if it fails, build with -j1 V=s to get more verbose output so we know what broke in the GHA logs.
+# For each step, docker/make-retry.sh does a parallel build with multiple cores; if it fails, it shows the failing package logs and
+# builds with -j1 V=s to get more verbose output so we know what broke in the GHA logs. The same scripts are used by 000.dev.sh.
+# Each script is bind-mounted into its own step, so editing one only invalidates the steps that use it.
 
 # Build the toolchain
-RUN make -j$(($(nproc)+2)) toolchain/install || make toolchain/install -j1 V=s
+RUN --mount=type=bind,source=docker/make-retry.sh,target=/tmp/make-retry.sh bash /tmp/make-retry.sh toolchain/install
 
 # Build the kernel
-RUN make -j$(($(nproc)+2)) target/linux/compile || make target/linux/compile -j1 V=s
+RUN --mount=type=bind,source=docker/make-retry.sh,target=/tmp/make-retry.sh bash /tmp/make-retry.sh target/linux/compile
 
-# Work around a python3 host-build breakage in the packages feed.
-# Feed commit d883c02a ("python3: pin host curses to the SDK's narrow ncurses") forces every curses
-# header check in CPython's configure to "no", but it also added ncurses/host to HOST_BUILD_DEPENDS -
-# so pkg-config still finds hostpkg's ncursesw and configure still enables the _curses module.
-# Include/py_curses.h then includes no curses header at all (all its HAVE_*CURSES*_H are off) and
-# Modules/_cursesmodule.c fails to compile, taking the whole PGO host build down with it.
-# The host python has no use for curses, so disable the modules outright - the same way the feed
-# already disables _tkinter.
+# Work around a python3 host-build breakage in the packages feed (see docker/patch-python-host.sh).
 # Kept here, and not next to the feeds install, on purpose: this layer sits after the toolchain and
 # kernel builds, so applying it does not invalidate those (expensive) cached layers.
-RUN <<HEREDOC
-set -e
-py3_makefile=feeds/packages/lang/python/python3/Makefile
-if grep -q 'py_cv_module__curses' "${py3_makefile}"; then
-	echo "python3 feed already disables _curses for the host build; nothing to do"
-else
-	grep -q 'py_cv_module__tkinter=n/a' "${py3_makefile}" || { echo "python3 feed Makefile no longer has the expected anchor, curses workaround needs a look" >&2; exit 1; }
-	sed -i 's|py_cv_module__tkinter=n/a|py_cv_module__tkinter=n/a \\\n\tpy_cv_module__curses=n/a \\\n\tpy_cv_module__curses_panel=n/a|' "${py3_makefile}"
-fi
-grep -n -A 4 '^HOST_CONFIGURE_VARS' "${py3_makefile}"
-HEREDOC
+RUN --mount=type=bind,source=docker/patch-python-host.sh,target=/tmp/patch-python-host.sh bash /tmp/patch-python-host.sh
 
 # Build the packages
-RUN <<'HEREDOC'
-#!/bin/bash
-set -e
-make -j$(($(nproc)+2)) package/compile && exit 0
-echo "=== parallel package/compile failed; tails of the failing package logs ==="
-find logs -name '*.txt' -exec grep -l -E 'Error [0-9]+$|error:|Patch failed' {} + 2>/dev/null | head -20 | while read -r f; do echo "--- $f"; tail -n 60 "$f"; done
-echo "=== retrying with -j1 V=s ==="
-make package/compile -j1 V=s
-HEREDOC
+RUN --mount=type=bind,source=docker/make-retry.sh,target=/tmp/make-retry.sh bash /tmp/make-retry.sh package/compile
 
 # Build the firmware
-RUN <<'HEREDOC'
-#!/bin/bash
-set -e
-make -j$(($(nproc)+2)) && exit 0
-echo "=== parallel image build failed; tails of the failing logs ==="
-find logs -name '*.txt' -exec grep -l -E 'Error [0-9]+$|error:|Patch failed' {} + 2>/dev/null | head -20 | while read -r f; do echo "--- $f"; tail -n 60 "$f"; done
-echo "=== retrying with -j1 V=s ==="
-make -j1 V=s
-HEREDOC
+RUN --mount=type=bind,source=docker/make-retry.sh,target=/tmp/make-retry.sh bash /tmp/make-retry.sh
 
 # Show results with tree
 # RUN tree -h  bin
@@ -182,7 +135,7 @@ HEREDOC
 ### --------------------------------------------------------------------------------------------------------------------
 
 FROM build AS image-common
-COPY --chown=openwrt:root docker/build-image.sh docker/
+COPY --chown=openwrt:root docker/build-image.sh docker/make-retry.sh docker/
 COPY --chown=openwrt:root diffconfig.r5s.final diffconfig.r6c.final ./
 COPY --chown=openwrt:root files_r5s files_r5s
 COPY --chown=openwrt:root files_r6c files_r6c
