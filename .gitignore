@@ -36,3 +36,9 @@ git-src
 .sccache
 .vscode*
 .idea
+
+# local build/debug artifacts
+/out/
+/log-build-*.txt
+/logs-*.txt
+/mods.*.lsmod.txt
