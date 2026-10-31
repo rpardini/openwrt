@@ -9,7 +9,7 @@
 
 set -o errexit -o pipefail -o nounset
 
-declare board="${1}"           # r5s; picks diffconfig.<board>.final and files_<board>
+declare board="${1}"           # e24c | r5s | r6c; picks diffconfig.<board>.final and files_<board>
 declare variant="${2}"         # custom: overlay files_<board>; generic: no overlay at all
 declare release_version="${3}" # ends up in the names of the shipped files
 declare extras="${4:-}"        # --extras: also pack up bin/targets into a tarball
