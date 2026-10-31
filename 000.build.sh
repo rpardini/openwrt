@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 set -e
+# Full, clean, CI-equivalent build. For iterating on fixes use ./000.dev.sh (incremental, same docker/*.sh steps).
 
 declare target="${1:-"r5s"}"
 
