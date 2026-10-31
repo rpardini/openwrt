@@ -50,7 +50,7 @@ if [[ -d "${target_dir}" ]]; then
 fi
 
 echo "${log_prefix} building the image"
-make -j"$(($(nproc) + 2))" || make -j1 V=s
+./docker/make-retry.sh
 
 # Device/Default in target/linux/rockchip/image/Makefile sets IMAGES := sysupgrade.img.gz, so with a
 # single device selected there is exactly one image here. Anything else means this needs a look.
