@@ -14,7 +14,8 @@
 #   ./000.dev.sh sync | shell | logs <pkg> | reset
 #
 # Output is also teed to logs-dev-<command>-<timestamp>.txt (logs-dev-latest.txt = newest); `shell` is not logged.
-# DEV_BOARD (default r5s) picks diffconfig.<board>.final as the tree's .config; it's re-applied when that file changes.
+# DEV_BOARD (default r5s) picks the board: its diffconfig is composed by docker/compose-config.sh (r5s base + diffconfig.<board>.delta)
+# and re-applied to .config when the result changes.
 
 set -o errexit -o pipefail -o nounset
 
@@ -62,7 +63,7 @@ function do_up() {
 			--driver-opt env.BUILDKIT_STEP_LOG_MAX_SPEED=-1
 	fi
 	docker buildx build --builder "${builder}" --load --progress=plain --target downloaded \
-		--build-arg="MACHINE_ID=${board}" "--build-arg=OPENWRT_CONFIG=diffconfig.${board}.final" \
+		--build-arg="MACHINE_ID=r5s" \
 		--build-arg="RELEASE_VERSION=00000000-0000" -t "${base_image}" .
 
 	if ! docker container inspect "${container}" > /dev/null 2>&1; then
@@ -91,14 +92,15 @@ rsync -a --delete --exclude=/feeds /host-src/package/ package/
 rsync -a /host-src/scripts/ scripts/
 for d in /host-src/files_*; do rsync -a --delete "${d}/" "$(basename "${d}")/"; done
 rsync -a /host-src/Config.in /host-src/Makefile /host-src/rules.mk .
-rsync -a /host-src/diffconfig.*.final .
+rsync -a /host-src/diffconfig.*.final /host-src/diffconfig.*.delta .
 
-# re-seed .config only when this board's diffconfig changed (or build-image.sh replaced .config)
+# re-seed .config only when this board's composed diffconfig changed (or build-image.sh replaced .config)
 board="${1}"
-want="$(sha256sum "diffconfig.${board}.final" | cut -d' ' -f1)"
+./docker/compose-config.sh "${board}" > .dev-diffconfig.composed
+want="$(sha256sum .dev-diffconfig.composed | cut -d' ' -f1)"
 if [[ "$(cat .dev-diffconfig.sha256 2> /dev/null || true)" != "${want}" ]]; then
-	echo "==> seeding .config from diffconfig.${board}.final"
-	cp "diffconfig.${board}.final" .config
+	echo "==> seeding .config from the composed diffconfig for ${board}"
+	cp .dev-diffconfig.composed .config
 	make defconfig
 	echo "${want}" > .dev-diffconfig.sha256
 fi
