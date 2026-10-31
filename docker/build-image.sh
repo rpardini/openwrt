@@ -2,14 +2,14 @@
 
 # Builds one image variant, inside the build container, on top of the shared build stage.
 # That stage has already compiled the toolchain, the kernel and every package for rockchip/armv8,
-# and all three boards share those, so what actually runs here is the image assembly plus whatever
+# and the boards share those, so what actually runs here is the image assembly plus whatever
 # handful of packages differ between the board configs.
 #
 # Usage: docker/build-image.sh <board> <custom|generic> <release_version> [--extras]
 
 set -o errexit -o pipefail -o nounset
 
-declare board="${1}"           # r5s | r6c; picks diffconfig.<board>.final and files_<board>
+declare board="${1}"           # r5s; picks diffconfig.<board>.final and files_<board>
 declare variant="${2}"         # custom: overlay files_<board>; generic: no overlay at all
 declare release_version="${3}" # ends up in the names of the shipped files
 declare extras="${4:-}"        # --extras: also pack up bin/targets into a tarball
