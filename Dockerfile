@@ -141,10 +141,26 @@ grep -n -A 4 '^HOST_CONFIGURE_VARS' "${py3_makefile}"
 HEREDOC
 
 # Build the packages
-RUN make -j$(($(nproc)+2)) package/compile || make package/compile -j1 V=s
+RUN <<'HEREDOC'
+#!/bin/bash
+set -e
+make -j$(($(nproc)+2)) package/compile && exit 0
+echo "=== parallel package/compile failed; tails of the failing package logs ==="
+find logs -name '*.txt' -exec grep -l -E 'Error [0-9]+$|error:|Patch failed' {} + 2>/dev/null | head -20 | while read -r f; do echo "--- $f"; tail -n 60 "$f"; done
+echo "=== retrying with -j1 V=s ==="
+make package/compile -j1 V=s
+HEREDOC
 
 # Build the firmware
-RUN make -j$(($(nproc)+2)) || make -j1 V=s
+RUN <<'HEREDOC'
+#!/bin/bash
+set -e
+make -j$(($(nproc)+2)) && exit 0
+echo "=== parallel image build failed; tails of the failing logs ==="
+find logs -name '*.txt' -exec grep -l -E 'Error [0-9]+$|error:|Patch failed' {} + 2>/dev/null | head -20 | while read -r f; do echo "--- $f"; tail -n 60 "$f"; done
+echo "=== retrying with -j1 V=s ==="
+make -j1 V=s
+HEREDOC
 
 # Show results with tree
 # RUN tree -h  bin
