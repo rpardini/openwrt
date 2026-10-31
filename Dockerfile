@@ -122,7 +122,7 @@ RUN --mount=type=bind,source=docker/make-retry.sh,target=/tmp/make-retry.sh bash
 # RUN du -h -d 6 -x bin | sort -h
 
 ### --------------------------------------------------------------------------------------------------------------------
-### Per-board image stages. Everything above this line is board-agnostic: all boards are rockchip/armv8 (r6c is disabled for now), so they
+### Per-board image stages. Everything above this line is board-agnostic: all boards are rockchip/armv8, so they
 ### share the same toolchain, kernel and packages, and their diffconfigs differ only in the selected device. Each stage below
 ### just re-points .config at its board, swaps the files/ overlay and re-runs the image build; they do not depend on each other, so buildx builds them in parallel.
 ###
@@ -136,8 +136,10 @@ RUN --mount=type=bind,source=docker/make-retry.sh,target=/tmp/make-retry.sh bash
 
 FROM build AS image-common
 COPY --chown=openwrt:root docker/build-image.sh docker/make-retry.sh docker/
-COPY --chown=openwrt:root diffconfig.r5s.final ./
+COPY --chown=openwrt:root diffconfig.e24c.final diffconfig.r5s.final diffconfig.r6c.final ./
+COPY --chown=openwrt:root files_e24c files_e24c
 COPY --chown=openwrt:root files_r5s files_r5s
+COPY --chown=openwrt:root files_r6c files_r6c
 
 FROM image-common AS image-r5s-custom
 ARG RELEASE_VERSION="00000000-0000"
@@ -147,8 +149,28 @@ FROM image-common AS image-r5s-generic
 ARG RELEASE_VERSION="00000000-0000"
 RUN ./docker/build-image.sh r5s generic "${RELEASE_VERSION}"
 
+FROM image-common AS image-e24c-custom
+ARG RELEASE_VERSION="00000000-0000"
+RUN ./docker/build-image.sh e24c custom "${RELEASE_VERSION}" --extras
+
+FROM image-common AS image-e24c-generic
+ARG RELEASE_VERSION="00000000-0000"
+RUN ./docker/build-image.sh e24c generic "${RELEASE_VERSION}"
+
+FROM image-common AS image-r6c-custom
+ARG RELEASE_VERSION="00000000-0000"
+RUN ./docker/build-image.sh r6c custom "${RELEASE_VERSION}" --extras
+
+FROM image-common AS image-r6c-generic
+ARG RELEASE_VERSION="00000000-0000"
+RUN ./docker/build-image.sh r6c generic "${RELEASE_VERSION}"
+
 # Finally the output stage, collecting what every board/variant stage shipped to /dist
 FROM alpine:3
 WORKDIR /out
 COPY --from=image-r5s-custom /dist/ /out/
 COPY --from=image-r5s-generic /dist/ /out/
+COPY --from=image-r6c-custom /dist/ /out/
+COPY --from=image-r6c-generic /dist/ /out/
+COPY --from=image-e24c-custom /dist/ /out/
+COPY --from=image-e24c-generic /dist/ /out/
