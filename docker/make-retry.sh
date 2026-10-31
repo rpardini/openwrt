@@ -7,6 +7,16 @@
 
 set -o errexit -o pipefail -o nounset
 
+# The failing-package log tails below need per-package logs in logs/. Force CONFIG_BUILD_LOG (which needs
+# CONFIG_DEVEL) on here, so no diffconfig has to carry it; this is a no-op when .config already has both.
+if ! grep -qx 'CONFIG_BUILD_LOG=y' .config 2> /dev/null; then
+	echo "==> enabling CONFIG_DEVEL + CONFIG_BUILD_LOG in .config"
+	sed -i -e '/^CONFIG_DEVEL=/d' -e '/^# CONFIG_DEVEL is not set$/d' -e '/^CONFIG_BUILD_LOG=/d' -e '/^# CONFIG_BUILD_LOG is not set$/d' .config
+	printf 'CONFIG_DEVEL=y\nCONFIG_BUILD_LOG=y\n' >> .config
+	make defconfig > /dev/null
+	grep -qx 'CONFIG_BUILD_LOG=y' .config || { echo "CONFIG_BUILD_LOG did not stick after defconfig" >&2; exit 1; }
+fi
+
 declare make_log
 make_log="$(mktemp)"
 trap 'rm -f "${make_log}"' EXIT
