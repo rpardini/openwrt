@@ -46,6 +46,25 @@ config domain
 	option name 'kodi-mysql.fritz.box'
 	option ip '192.168.66.120'
 
+config tag 'pihole'
+	list dhcp_option '6,192.168.76.53'
+
+config domain
+	option name 'snap'
+	option ip '192.168.66.142'
+
+config host
+	option name 'reolink-e1-outdoor-pro-02-wifi'
+	option ip '192.168.66.7'
+	list mac '68:c8:c0:60:8e:d7'
+	option dns '1'
+
+config host
+	option name 'reolink-e1-outdoor-pro-02-eth'
+	option ip '192.168.66.8'
+	list mac 'ec:71:db:a9:99:8e'
+	option dns '1'
+
 config host
 	option name 'tuya-floodlight-rgb-100w'
 	option ip '192.168.66.9'
@@ -72,6 +91,7 @@ config host
 	option ip '192.168.66.14'
 	list mac 'ee:76:24:ac:78:a2'
 	option dns '1'
+	list tag 'tink_pxelinux_http_rk3588ng'
 
 config host
 	option name 'mixtile-edge2-wifi'
@@ -149,6 +169,12 @@ config host
 	option dns '1'
 
 config host
+	option ip '192.168.66.33'
+	list mac '98:a3:16:7b:bc:d4'
+	option name 'Power-Strip-4-Gen4-X003'
+	option dns '1'
+
+config host
 	option name 'nullpointer-onboard'
 	option ip '192.168.66.60'
 	list mac '2C:4D:54:D3:BE:57'
@@ -221,9 +247,10 @@ config host
 config host
 	option name 'radxa-nio-12l'
 	option ip '192.168.66.83'
-	list mac 'BE:C0:45:F1:A0:D2'
-	list tag 'tink_pxelinux_rk3588ng'
 	option dns '1'
+	list mac 'BE:C0:45:F1:A0:D2'
+	list mac '12:f3:ae:d1:ac:1e'
+	list tag 'tink_pxelinux_http_rk3588ng'
 
 config host
 	option ip '192.168.66.84'
@@ -271,6 +298,7 @@ config host
 	option ip '192.168.66.144'
 	option dns '1'
 	list mac '00:03:7F:12:BD:F0'
+	list mac '02:a9:93:07:2d:a5'
 
 config host
 	option name 'mixtile-blade3a-end0'
@@ -384,11 +412,4 @@ config host
 	list mac 'F6:F8:A2:D1:1C:E4'
 	option dns '1'
 	list tag 'pihole'
-
-config tag 'pihole'
-	list dhcp_option '6,192.168.76.53'
-
-config domain
-	option name 'snap'
-	option ip '192.168.66.142'
 
